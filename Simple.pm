@@ -1,7 +1,7 @@
 ######################################################################
 package Proc::Simple;
 ######################################################################
-# Copyright 1996-2000 by Michael Schilli, all rights reserved.
+# Copyright 1996-2001 by Michael Schilli, all rights reserved.
 #
 # This program is free software, you can redistribute it and/or 
 # modify it under the same terms as Perl itself.
@@ -24,8 +24,13 @@ Proc::Simple -- launch and control background processes
    $myproc = Proc::Simple->new();        # Create a new process object
 
    $myproc->start("shell-command-line"); # Launch a shell process
+   $myproc->start("command",             # Launch a shell process
+                  "param", ...);         # with parameters
+                                        
    $myproc->start(sub { ... });          # Launch a perl subroutine
    $myproc->start(\&subroutine);         # Launch a perl subroutine
+   $myproc->start(\&subroutine,          # Launch a perl subroutine
+                  $param, ...);          # with parameters
 
    $running = $myproc->poll();           # Poll Running Process
 
@@ -46,24 +51,31 @@ Proc::Simple -- launch and control background processes
 
 =head1 DESCRIPTION
 
-The Proc::Simple package provides objects that model real-life
+The Proc::Simple package provides objects mimicing real-life
 processes from a user's point of view. A new process object is created by
 
    $myproc = Proc::Simple->new();
 
-Either shell-like command lines or references to perl
-subroutines can be specified for launching a process in background.
-A 10-second sleep process, for example, can be started via the
-shell as
+Either external programs or perl subroutines can be launched and
+controlled as processes in the background.
 
-   $myproc->start("sleep 10");
+A 10-second sleep process, for example, can be launched 
+as an external program as in
 
-or, as a perl subroutine, with
+   $myproc->start("/bin/sleep 10");    # or
+   $myproc->start("/bin/sleep", "10");
+
+or as a perl subroutine, as in
+
+   sub mysleep { sleep(shift); }    # Define mysleep()
+   $myproc->start(\&mysleep, 10);   # Launch it.
+
+or even as
 
    $myproc->start(sub { sleep(10); });
 
 The I<start> Method returns immediately after starting the
-specified process in background, i.e. non-blocking mode.
+specified process in background, i.e. there's no blocking.
 It returns I<1> if the process has been launched
 sucessfully and I<0> if not.
 
@@ -85,9 +97,9 @@ it succeeds in sending the signal, I<0> if it doesn't.
 
 The methods are discussed in more detail in the next section.
 
-A destructor is provided so that the forked processes can be
-sent a signal automatically should the perl object be
-destroyed or if the perl process exits. By default this
+A destructor is provided so that a signal can be sent to
+the forked processes automatically should the process object be
+destroyed or if the process exits. By default this
 behaviour is turned off (see the kill_on_destroy and
 signal_on_destroy methods).
 
@@ -102,7 +114,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -153,19 +165,59 @@ sub new {
 
 =item start
 
-Launch a new process. For an external program to be started like
-from the shell, call
+Launches a new process.
+The C<start()> method can be used to launch both external programs 
+(like C</bin/echo>) or one of your self-defined subroutines
+(like C<foo()>) in a new process.
+
+=head2 Starting External Programs
+
+For an external program to be started, call
 
  $status = $proc->start("program-name");
 
-If, on the other hand, you want to start execution of a Perl function
+If you want to pass a couple of parameters to the launched program,
+there's two options: You can either pass them in one argument like
+in
+
+ $status = $proc->start("/bin/echo hello world");
+
+or in several arguments like in
+
+ $status = $proc->start("/bin/echo", "hello", "world");
+
+Just as in Perl's function C<system()>, there's a big difference 
+between the two methods: If you provide one argument containing
+a blank-separated command line, your shell is going to
+process any meta-characters (if you choose to use some) before
+the process is actually launched:
+
+ $status = $proc->start("/bin/ls -l /etc/initt*");
+
+will expand C</etc/initt*> to C</etc/inittab> before running the C<ls>
+command. If, on the other hand, you say
+
+ $status = $proc->start("/bin/ls", "-l", "*");
+
+the C<*> will stay unexpanded, meaning you'll look for a file with the
+literal name C<*> (which is unlikely to exist on your system unless
+you deliberately create confusingly named files :). For
+more info on this, look up C<perldoc -f exec>.
+
+=head2 Starting Subroutines
+
+If, on the other hand, you want to start a Perl subroutine
 in the background, simply provide the function reference like
 
- $status = $proc->start(\&perl_function);
+ $status = $proc->start(\&your_function);
 
 or supply an unnamed subroutine:
 
  $status = $proc->start( sub { sleep(1) } );
+
+You can also provide additional parameters to be passed to the function:
+
+ $status = $proc->start(\&printme, "hello", "world");
 
 The I<start> Method returns immediately after starting the
 specified process in background, i.e. non-blocking mode.
@@ -179,7 +231,7 @@ sucessfully and I<0> if not.
 ######################################################################
 sub start {
   my $self  = shift;
-  my $func  = shift;
+  my ($func, @params) = @_;
 
   # Reap Zombies automatically
   $SIG{'CHLD'} = \&THE_REAPER;
@@ -188,9 +240,10 @@ sub start {
   if(($self->{'pid'}=fork()) == 0) { # Child
 
       if(ref($func) eq "CODE") {
-	  &$func; exit 0;            # Start perl subroutine
+	  $func->(@params); exit 0;            # Start perl subroutine
       } else {
-          exec $func;                # Start shell process
+print STDERR "*** Calling $func @params\n";
+          exec $func, @params;       # Start shell process
           exit 0;                    # In case something goes wrong
       }
   } elsif($self->{'pid'} > 0) {      # Parent:
@@ -534,10 +587,10 @@ handlers defined that avoid the shutdown.
 If in doubt, whether a process still exists, check it
 repeatedly with the I<poll> routine after sending the signal.
 
-=head1 Requirements
+=head1 REQUIREMENTS
 
 I'd recommend using perl 5.6.0 although it might also run with 5.003
-also -- if you don't have it, this is the time to upgrade!
+-- if you don't have it, this is the time to upgrade!
 
 =head1 AUTHORS
 
@@ -548,5 +601,10 @@ Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 Mark R. Southern <mark_southern@merck.com>
    worked on EXIT_STATUS tracking
+
+=head1 THANKS TO
+
+Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu>
+suggested the multi-arg start()-methods.
 
 =cut
