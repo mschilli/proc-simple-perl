@@ -1,88 +1,14 @@
-
-=head1 NAME
-
-Proc::Simple -- launch and control background processes
-
-=head1 SYNOPSIS
-
-   use Proc::Simple;
-
-   $myproc = Proc::Simple->new();        # Create a new process object
-
-   $myproc->start("shell-command-line"); # Launch a shell process
-   $myproc->start(sub { ... });          # Launch a perl subroutine
-   $myproc->start(\&subroutine);         # Launch a perl subroutine
-
-   $running = $myproc->poll();           # Poll Running Process
-
-   $myproc->kill();                      # Kill Process (SIGTERM)
-
-
-   $myproc->kill("SIGUSR1");             # Send specified signal
-
-
-   Proc::Simple->debug($level);          # Turn debug on
-
-=head1 DESCRIPTION
-
-The Proc::Simple package provides objects that model real-life
-processes from a user's point of view. A new process object is created by 
-
-   $myproc = Proc::Simple->new();
-
-Either shell-like command lines or references to perl
-subroutines can be specified for launching a process in background.
-A 10-second sleep process, for example, can be started via the
-shell as
-
-   $myproc->start("sleep 10");
-
-or, as a perl subroutine, with
-
-   $myproc->start(sub { sleep(10); });
-
-The I<start> Method returns immediately after starting the
-specified process in background, i.e. non-blocking mode.
-It returns I<1> if the process has been launched
-sucessfully and I<0> if not.
-
-The I<poll> method checks if the process is still running
-
-   $running = $myproc->poll();
-
-and returns I<1> if it is, I<0> if it's not. Finally, 
-
-   $myproc->kill();
-
-terminates the process by sending it the SIGTERM signal. As an
-option, another signal can be specified.
-
-   $myproc->kill("SIGUSR1");
-
-sends the SIGUSR1 signal to the running process. I<kill> returns I<1> if
-it succeeds in sending the signal, I<0> if it doesn't.
-
-=head1 NOTE
-
-Please keep in mind that there is no guarantee that the SIGTERM
-signal really terminates a process. Processes can have signal
-handlers defined that avoid the shutdown.
-If in doubt, whether a process still exists, check it
-repeatedly with the I<poll> routine after sending the signal.
-
-=head1 AUTHOR
-
-Michael Schilli <schilli@tep.e-technik.tu-muenchen.de>
-
-=cut
-
-$VERSION = "1.12";
-sub Version { $VERSION };
-
-use strict;
-
 package Proc::Simple;
 
+use strict;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+
+require Exporter;
+
+@ISA = qw(Exporter AutoLoader);
+@EXPORT = qw( );
+
+$VERSION = '1.13';
 
 my $Debug = 0;
 
@@ -106,6 +32,9 @@ sub dprt {
 sub new { 
   my $class = shift;
   my $self  = {};
+  
+  $self->{kill_on_destroy} = undef;
+
   bless($self, $class);
 }
 
@@ -182,6 +111,108 @@ sub kill
   1;
 }
 
+###
+### Set the signal that is sent to the process if the object is 
+### destroyed.
+###
+sub kill_on_destroy {
+    my $self = shift;
+    $self->{kill_on_destroy} = (shift || "SIGTERM");
+}
+
+### Destroy method. Called if the object is destroyed, and sends the
+### kill_on_destroy signal to the process if one is defined.
+sub DESTROY {
+    my $self = shift;
+
+    # If the kill_on_destroy flag is true, then we need to send a 
+    # signal to the process
+    if (defined $self->{kill_on_destroy}) {
+        $self->kill($self->{kill_on_destroy});
+    }
+}
+
 1;
 
 __END__
+
+=head1 NAME
+
+Proc::Simple -- launch and control background processes
+
+=head1 SYNOPSIS
+
+   use Proc::Simple;
+
+   $myproc = Proc::Simple->new();        # Create a new process object
+
+   $myproc->start("shell-command-line"); # Launch a shell process
+   $myproc->start(sub { ... });          # Launch a perl subroutine
+   $myproc->start(\&subroutine);         # Launch a perl subroutine
+
+   $running = $myproc->poll();           # Poll Running Process
+
+   $myproc->kill();                      # Kill Process (SIGTERM)
+
+
+   $myproc->kill("SIGUSR1");             # Send specified signal
+
+   $myproc->kill_on_destroy("SIGTERM");  # Set the signal that is to 
+                                         # be sent to the process if the
+                                         # object is destroyed 
+
+   Proc::Simple->debug($level);          # Turn debug on
+
+=head1 DESCRIPTION
+
+The Proc::Simple package provides objects that model real-life
+processes from a user's point of view. A new process object is created by 
+
+   $myproc = Proc::Simple->new();
+
+Either shell-like command lines or references to perl
+subroutines can be specified for launching a process in background.
+A 10-second sleep process, for example, can be started via the
+shell as
+
+   $myproc->start("sleep 10");
+
+or, as a perl subroutine, with
+
+   $myproc->start(sub { sleep(10); });
+
+The I<start> Method returns immediately after starting the
+specified process in background, i.e. non-blocking mode.
+It returns I<1> if the process has been launched
+sucessfully and I<0> if not.
+
+The I<poll> method checks if the process is still running
+
+   $running = $myproc->poll();
+
+and returns I<1> if it is, I<0> if it's not. Finally, 
+
+   $myproc->kill();
+
+terminates the process by sending it the SIGTERM signal. As an
+option, another signal can be specified.
+
+   $myproc->kill("SIGUSR1");
+
+sends the SIGUSR1 signal to the running process. I<kill> returns I<1> if
+it succeeds in sending the signal, I<0> if it doesn't.
+
+=head1 NOTE
+
+Please keep in mind that there is no guarantee that the SIGTERM
+signal really terminates a process. Processes can have signal
+handlers defined that avoid the shutdown.
+If in doubt, whether a process still exists, check it
+repeatedly with the I<poll> routine after sending the signal.
+
+=head1 AUTHOR
+
+Michael Schilli <michael@perlmeister.com>
+
+=cut
+
