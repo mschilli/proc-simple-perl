@@ -99,7 +99,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -215,7 +215,7 @@ and returns I<1> if it is, I<0> if it's not.
 sub poll {
   my $self = shift;
 
-  if(exists($self->{'pid'})) {
+  if(defined($self->{'pid'})) {
       if(kill(0, $self->{'pid'})) {
           $self->dprt("POLL($self->{'pid'}) RESPONDING");
 	  return 1;
@@ -259,7 +259,7 @@ sub kill {
   $sig = "SIGTERM" unless defined $sig;
 
   # Process initialized at all?
-  return 0 if !exists $self->{'pid'};
+  return 0 if !defined $self->{'pid'};
 
   # Send signal
   if(kill($sig, $self->{'pid'})) {
