@@ -1,0 +1,62 @@
+
+Module:        Proc::Simple.pm    Version 1.12
+
+Author:        Michael Schilli
+
+Description:   Proc::Simple helps controlling background processes. It 
+               provides "Process Objects" that mimic their real world
+               counterparts.
+
+               A Process object can be activated, i.e. the corresponding
+               process can be started either with a shell-like 
+               command line or by specifying a perl subroutine. The
+               'start' Method of the process object is non-blocking, i.e.
+               it returns immediately and runs the specified process in 
+               background mode. Every process object provides a 'poll' method 
+               that tells if the corresponding process is still running 
+               and the 'kill' method can be used to finally terminate it
+               or send and arbitrary UNIX-signal.
+
+Logic:       
+               use Proc::Simple;
+
+               $myproc = Proc::Simple->new();        # New process object
+
+               $myproc->start("sleep 10");           # Start Shell process
+           OR
+               $myproc->start(sub { sleep 10; });    # Start Perl Sub
+
+               print "alive!\n" if $myproc->poll();  # Poll Process
+
+               $myproc->kill("SIGUSR1");             # Send signal
+               $myproc->kill();                      # Terminate 
+
+
+Changes:       from 1.1:  Process is now called Proc::Simple to fit in the
+                          CPAN namespace, corrections Andreas Koenig suggested.
+               from 1.11: binkley's error: threw out waitpid, wait is
+			  performed by signal handler now.
+
+Release Date:  96/05/22
+
+Requirements:  Perl 5.002
+
+
+Manpages:      Embedded in Proc/Simple.pm as usual:
+
+               pod2man Proc/Simple.pm | nroff -man | more
+
+Installation:
+
+	       perl Makefile.PL
+	       make 
+	       make test
+	       make install
+
+Copyright:     (c) 1996 Michael Schilli. All rights reserved. This program
+               is free software, you can redistribute it and/or modify it
+               under the same terms as Perl itself.
+
+Have fun!
+
+Michael Schilli schilli@tep.e-technik.tu-muenchen.de
