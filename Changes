@@ -1,0 +1,43 @@
+######################################################################
+    Proc::Simple CHANGES
+######################################################################
+
+          from 1.18: Added multi-arg start method (proposed by
+                     Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu>)
+
+          from 1.17: Fixed Version difference between Makefile.PL
+                     and Simple by using VERSION_FROM (thanks
+                     Andreas Koenig)
+
+          from 1.16: Fixed bug with Proc::Simple instances which
+                     were DESTROYED before they were ever started.
+                     Many thanks to Russell Fulton (r.fulton@auckland.ac.nz)
+                     for pointing this out.
+
+          from 1.15: Added %DESTROYED hash for processes which might
+                     still in zombie state right after their objects
+                     went out of business. THE_REAPER will take care
+                     of them.
+
+          from 1.14: Added exit_status() method and a smart
+                     REAPER which reaps only processes we've started before.
+
+          from 1.13: Replaced two erronous uses of 'exists' by 'defined'.
+                     Thanks to Rolf.Beutner@telekom.de for pointing this
+                     out.
+          from 1.12: To fight problems with zombies, replaced the wait()
+                     function by a NOWAIT waitpid on systems that 
+                     support it.
+
+                     Tim Jenness <t.jenness@jach.hawaii.edu> included
+                     kill_on_destroy/sig_on_destroy/pid methods.
+
+          from 1.11: binkley's error: threw out waitpid, wait is
+                     performed by signal handler now.
+
+          from 1.1:  Process is now called Proc::Simple to fit in the
+                     CPAN namespace, corrections Andreas Koenig suggested.
+
+First Release:  05/22/96
+
+Michael Schilli procsimple@perlmeister.com
