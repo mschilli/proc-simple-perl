@@ -23,8 +23,8 @@ Proc::Simple -- launch and control background processes
 
    $myproc = Proc::Simple->new();        # Create a new process object
 
-   $myproc->start("shell-command-line"); # Launch a shell process
-   $myproc->start("command",             # Launch a shell process
+   $myproc->start("shell-command-line"); # Launch an external program
+   $myproc->start("command",             # Launch an external program
                   "param", ...);         # with parameters
                                         
    $myproc->start(sub { ... });          # Launch a perl subroutine
