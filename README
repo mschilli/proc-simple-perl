@@ -1,5 +1,5 @@
 
-Module:   Proc::Simple.pm    Version 1.15 (10/16/00)
+Module:   Proc::Simple.pm    Version 1.16 (10/29/00)
 
 Author:   Michael Schilli
 
@@ -41,6 +41,11 @@ Synopsis:
           Proc::Simple::debug($level);          # Turn debug on
 
 Changes:       
+          from 1.15: Added %DESTROYED hash for processes which might
+                     still in zombie state right after their objects
+                     went out of business. THE_REAPER will take care
+                     of them.
+
           from 1.14: Added exit_status() method and a smart
                      REAPER which reaps only processes we've started before.
 

@@ -95,13 +95,14 @@ signal_on_destroy methods).
 
 require 5.003;
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS);
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS 
+            %DESTROYED);
 
 require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -387,6 +388,7 @@ sub DESTROY {
         }
     }
     delete $EXIT_STATUS{ $self->pid };
+    $DESTROYED{ $self->pid } = 1;
 }
 
 ######################################################################
@@ -429,6 +431,18 @@ sub THE_REAPER {
         # Reason: close() doesn't like it if the spawn has
         # been reaped already. Oh well.
         #
+
+        # First, check if we can reap the processes which 
+        # went out of business because their kill_on_destroy
+        # flag was set and their objects were destroyed.
+        foreach my $pid (keys %DESTROYED) {
+            if(my $res = waitpid($pid, $WNOHANG) > 0) {
+                # We reaped a zombie
+                delete $DESTROYED{$pid};
+                dprt("", "Reaped: $pid");
+            }
+        }
+        
         foreach my $pid (keys %EXIT_STATUS) {
             dprt("", "Trying to reap $pid");
             next if defined $EXIT_STATUS{$pid};
