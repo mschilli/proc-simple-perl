@@ -1,7 +1,7 @@
 MANIFEST
 Makefile.PL
 README
-lib/Proc/Simple.pm
+Simple.pm
 t/simple.t
 t/mult.t
 t/esub.t
