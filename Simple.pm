@@ -102,7 +102,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
