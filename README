@@ -1,58 +1,66 @@
 
-Module:        Proc::Simple.pm    Version 1.13
+Module:   Proc::Simple.pm    Version 1.13 (02/21/99)
 
-Author:        Michael Schilli
+Author:   Michael Schilli
 
-Description:   Proc::Simple helps controlling background processes. It 
-               provides "Process Objects" that mimic their real world
-               counterparts.
+Description:   
 
-               A Process object can be activated, i.e. the corresponding
-               process can be started either with a shell-like 
-               command line or by specifying a perl subroutine. The
-               'start' Method of the process object is non-blocking, i.e.
-               it returns immediately and runs the specified process in 
-               background mode. Every process object provides a 'poll' method 
-               that tells if the corresponding process is still running 
-               and the 'kill' method can be used to finally terminate it
-               or send and arbitrary UNIX-signal.
+          Proc::Simple helps controlling background processes in Perl. It 
+          provides "Process Objects" that mimic their real world 
+          counterparts. You don't have to deal with fork and wait and 
+          friends, Proc::Simple is very easy to use, you just start 
+          processes in background, poll their status once in a while and 
+          kill them if necessary. 
 
-Logic:       
-               use Proc::Simple;
+          Proc::Simple is reportedly used in monitoring applications that 
+          fire up external programs, or software that batch processes user 
+          programs by launching them in parallel in order to put constant 
+          load on an expensive number-crunching machine. 
 
-               $myproc = Proc::Simple->new();        # New process object
+Synopsis:       
+          use Proc::Simple;
 
-               $myproc->start("sleep 10");           # Start Shell process
-           OR
-               $myproc->start(sub { sleep 10; });    # Start Perl Sub
+          $myproc = Proc::Simple->new();        # Create a new process object
 
-               print "alive!\n" if $myproc->poll();  # Poll Process
+          $myproc->start("shell-command-line"); # Launch a shell process
+          $myproc->start(sub { ... });          # Launch a perl subroutine
+          $myproc->start(\&subroutine);         # Launch a perl subroutine
 
-               $myproc->kill("SIGUSR1");             # Send signal
-               $myproc->kill();                      # Terminate 
+          $running = $myproc->poll();           # Poll Running Process
 
+          $proc->kill_on_destroy(1);            # Set kill on destroy
+          $proc->signal_on_destroy("KILL");     # Specify signal to be sent
+                                                # on destroy
+
+          $myproc->kill();                      # Kill Process (SIGTERM)
+
+          $myproc->kill("SIGUSR1");             # Send specified signal
+
+          Proc::Simple::debug($level);          # Turn debug on
 
 Changes:       
-               from 1.12: To fight problems with zombies, replaced the wait()
-                          function by a NOWAIT waitpid on systems that 
-                          support it.
+          from 1.12: To fight problems with zombies, replaced the wait()
+                     function by a NOWAIT waitpid on systems that 
+                     support it.
 
-                          Tim Jenness' <t.jenness@jach.hawaii.edu> included
-                          kill_on_destroy/sig_on_destroy/pid methods.
+                     Tim Jenness <t.jenness@jach.hawaii.edu> included
+                     kill_on_destroy/sig_on_destroy/pid methods.
 
-               from 1.11: binkley's error: threw out waitpid, wait is
-			  performed by signal handler now.
-               from 1.1:  Process is now called Proc::Simple to fit in the
-                          CPAN namespace, corrections Andreas Koenig suggested.
+          from 1.11: binkley's error: threw out waitpid, wait is
+                     performed by signal handler now.
+
+          from 1.1:  Process is now called Proc::Simple to fit in the
+                     CPAN namespace, corrections Andreas Koenig suggested.
 
 Release Date:  96/05/22
+Latest Update: 99/02/21
 
 Requirements:  Perl 5.003
 
 
-Manpages:      Embedded in Proc/Simple.pm as usual:
+Manpages:      Embedded in Proc::Simple.pm as usual, just call:
 
-               pod2man Proc/Simple.pm | nroff -man | more
+               perldoc Proc::Simple
 
 Installation:
 
@@ -67,4 +75,4 @@ Copyright:     (c) 1996-1999 Michael Schilli. All rights reserved. This
 
 Have fun!
 
-Michael Schilli mschilli@perlmeister.com
+Michael Schilli procsimple@perlmeister.com
