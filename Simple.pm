@@ -242,7 +242,6 @@ sub start {
       if(ref($func) eq "CODE") {
 	  $func->(@params); exit 0;            # Start perl subroutine
       } else {
-print STDERR "*** Calling $func @params\n";
           exec $func, @params;       # Start shell process
           exit 0;                    # In case something goes wrong
       }
