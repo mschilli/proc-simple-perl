@@ -3,6 +3,9 @@
 use Proc::Simple;
 
 ### Test the new multi arg methods
+$| = 1;
+
+print "1..4\n";
 
 $psh  = Proc::Simple->new();
 
