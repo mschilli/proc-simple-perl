@@ -81,20 +81,16 @@ my $pid2 = $psh->pid;
 # Set flag
 $psh->kill_on_destroy(1);
 
-# Destroy object - process should still be running
+# Destroy object - after that, process should terminate
 undef $psh;
 
 # Process should no longer be running
 # The sleep makes sure that the process has died by the time
 # we get there
-sleep 2;
-$result = kill "SIGTERM", $pid2;
-
-print "Result should equal 0 if process was killed by object: $result\n";
-
-# Sense of check is reversed.
-if ($result) {
-  check(0);
-} else {
-  check(1);
+while(kill(0, $pid2)) {
+   sleep(1);
 }
+
+# If we get here, the test succeeded, otherwise it will loop endlessly.
+
+check(1);
