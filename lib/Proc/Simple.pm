@@ -9,7 +9,7 @@ require Exporter;
 @EXPORT = qw( );
 
 $VERSION = '1.13';
-$RCSVERSION = '$revision$';
+$RCSVERSION = '$Revision: 1.5 $';
 
 my $Debug = 0;
 
