@@ -33,7 +33,7 @@ sub new {
   my $class = shift;
   my $self  = {};
   
-  $self->{kill_on_destroy} = undef;
+  $self->{'kill_on_destroy'} = undef;
 
   bless($self, $class);
 }
@@ -117,7 +117,7 @@ sub kill
 ###
 sub kill_on_destroy {
     my $self = shift;
-    $self->{kill_on_destroy} = (shift || "SIGTERM");
+    $self->{'kill_on_destroy'} = (shift || "SIGTERM");
 }
 
 ### Destroy method. Called if the object is destroyed, and sends the
@@ -127,8 +127,8 @@ sub DESTROY {
 
     # If the kill_on_destroy flag is true, then we need to send a 
     # signal to the process
-    if (defined $self->{kill_on_destroy}) {
-        $self->kill($self->{kill_on_destroy});
+    if (defined $self->{'kill_on_destroy'}) {
+        $self->kill($self->{'kill_on_destroy'});
     }
 }
 
