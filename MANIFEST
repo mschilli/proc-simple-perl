@@ -1,10 +1,10 @@
 Changes
+eg/parproc.pl
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-Makefile.PL
 README
 Simple.pm
-eg/parproc.pl
 t/destroy.t
 t/esub.t
 t/exit.t
