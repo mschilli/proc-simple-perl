@@ -2,6 +2,7 @@
 
 use Proc::Simple;
 
+$| = 1;
 print "1..2\n";
 
 sub test_output {
@@ -26,7 +27,7 @@ close FILE;
 if($stderr eq "hello stderr\n") {
     print "ok 1\n";
 } else {
-    print "not ok 1\n";
+    print "not ok 1 ($stderr)\n";
 }
 
 if($stdout eq "hello stdout\n") {
