@@ -12,3 +12,4 @@ t/exit.t
 t/muarg.t
 t/mult.t
 t/simple.t
+t/stdouterr.t

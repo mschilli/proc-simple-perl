@@ -1,5 +1,5 @@
 ######################################################################
-    Proc::Simple 1.20
+    Proc::Simple 1.21
 ######################################################################
 
 NAME
@@ -192,6 +192,21 @@ METHODS
           $current = $proc->signal_on_destroy;
           $proc->signal_on_destroy("KILL");
 
+    redirect_output
+        This allows to redirect the stdout and/or stderr output to a file.
+        Specify undef to leave th
+
+          # stdout to a file, left stderr unchanged
+          $proc->redirect_output ("/tmp/someapp.stdout", undef);
+  
+          # stderr to a file, left stdout unchanged
+          $proc->redirect_output (undef, "/tmp/someapp.stderr");
+  
+          # stdout and stderr to a separate file
+          $proc->redirect_output ("/tmp/someapp.stdout", "/tmp/someapp.stderr");
+
+        Call this method before running the start method.
+
     pid Returns the pid of the forked process associated with this object
 
           $pid = $proc->pid;
@@ -221,8 +236,10 @@ REQUIREMENTS
         I'd recommend using perl 5.6.0 although it might also run with 5.003
         -- if you don't have it, this is the time to upgrade!
 
-AUTHORS
+AUTHOR
         Michael Schilli <michael@perlmeister.com>
+
+        Contributors:
 
         Tim Jenness <t.jenness@jach.hawaii.edu> did
         kill_on_destroy/signal_on_destroy/pid
@@ -230,7 +247,9 @@ AUTHORS
         Mark R. Southern <mark_southern@merck.com> worked on EXIT_STATUS
         tracking
 
-THANKS TO
+        Tobias Jahn <tjahn@users.sourceforge.net> added redirection to
+        stdout/stderr
+
         Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu> suggested the
         multi-arg start()-methods.
 
