@@ -1,5 +1,5 @@
 
-Module:   Proc::Simple.pm    Version 1.17 (11/18/00)
+Module:   Proc::Simple.pm    Version 1.18 (11/28/00)
 
 Author:   Michael Schilli
 
@@ -41,6 +41,10 @@ Synopsis:
           Proc::Simple::debug($level);          # Turn debug on
 
 Changes:       
+          from 1.17: Fixed Version difference between Makefile.PL
+                     and Simple by using VERSION_FROM (thanks
+                     Andreas Koenig)
+
           from 1.16: Fixed bug with Proc::Simple instances which
                      were DESTROYED before they were ever started.
                      Many thanks to Russell Fulton (r.fulton@auckland.ac.nz)
