@@ -2,6 +2,10 @@
     Proc::Simple CHANGES
 ######################################################################
 
+          from 1.20: Added patch by Tobias Jahn <tjahn@users.sourceforge.net>,
+                     to redirect STDOUT or STDERR of the child process upon
+                     request.
+
           from 1.19: Fixed bug which occurred on failed fork()s, as 
                      reported anonymously on the CPAN bug tracker.
 

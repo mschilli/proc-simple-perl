@@ -35,3 +35,4 @@ if($stdout eq "hello stdout\n") {
     print "not ok 2\n";
 }
 
+unlink("stdout.txt", "stderr.txt");
