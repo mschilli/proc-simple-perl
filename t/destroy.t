@@ -46,11 +46,9 @@ print "1..4\n";
 
 ### Test code
 
-$coderef = sub { while (1) { } };  # infinite loop
-
+$coderef = sub { while (1) { sleep(1) } };  # infinite loop
 
 $psh  = Proc::Simple->new();
-
 
 check($psh->start($coderef));         # 1
 
@@ -64,7 +62,7 @@ undef $psh;
 # Process should still be running - now kill it
 # The sleep is here to make the test fair with the 
 # ond_destroy test later
-sleep 1;
+sleep 2;
 check($result = kill "SIGTERM", $pid);      # 2
 
 print "Result should equal 1 if process was killed by us: $result\n";
@@ -89,7 +87,7 @@ undef $psh;
 # Process should no longer be running
 # The sleep makes sure that the process has died by the time
 # we get there
-sleep 1;
+sleep 2;
 $result = kill "SIGTERM", $pid2;
 
 print "Result should equal 0 if process was killed by object: $result\n";
