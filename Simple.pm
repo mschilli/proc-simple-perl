@@ -416,7 +416,19 @@ sub THE_REAPER {
 
     if(defined $WNOHANG) {
         # Try to reap every process we've ever started and 
-        # whichs Proc::Simple object hasn't been destroyed
+        # whichs Proc::Simple object hasn't been destroyed.
+        #
+        # This is getting really ugly. But if we just call the REAPER
+        # for every SIG{CHLD} event, code like this will fail:
+        #
+        # use Proc::Simple;
+        # $proc = Proc::Simple->new(); $proc->start(\&func); sleep(5);
+        # sub func { open(PIPE, "/bin/ls |"); @a = <PIPE>; sleep(1); 
+        #            close(PIPE) or die "PIPE failed"; }
+        # 
+        # Reason: close() doesn't like it if the spawn has
+        # been reaped already. Oh well.
+        #
         foreach my $pid (keys %EXIT_STATUS) {
             dprt("", "Trying to reap $pid");
             next if defined $EXIT_STATUS{$pid};
@@ -429,12 +441,15 @@ sub THE_REAPER {
             }
         }
     } else { 
+        # If we don't have $WNOHANG, we don't have a choice anyway.
+        # Just reap everything.
         $child = wait();
         $EXIT_STATUS{$child} = $?;
     }
 
-    # Reset signal handler for crappy sysV systems
-    $SIG{'CHLD'} = \&THE_REAPER;
+    # Don't reset signal handler for crappy sysV systems. Screw them.
+    # This caused problems with Irix 6.2
+    # $SIG{'CHLD'} = \&THE_REAPER;
 }
 
 ######################################################################
@@ -503,8 +518,8 @@ repeatedly with the I<poll> routine after sending the signal.
 
 =head1 Requirements
 
-I'd recommend using at least perl 5.003 -- if you don't have 
-it, this is the time to upgrade! Get 5.005_02 or better.
+I'd recommend using perl 5.6.0 although it might also run with 5.003
+also -- if you don't have it, this is the time to upgrade!
 
 =head1 AUTHORS
 

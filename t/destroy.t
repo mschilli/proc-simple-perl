@@ -23,7 +23,7 @@
 
 
 use Proc::Simple;
-Proc::Simple::debug(1);
+#Proc::Simple::debug(1);
 
 ###
 ### check(1) -> print #testno ok
@@ -87,10 +87,11 @@ undef $psh;
 # Process should no longer be running
 # The sleep makes sure that the process has died by the time
 # we get there
-while(kill(0, $pid2)) {
-   sleep(1);
+$i = 0;
+while($i++ < 10) {
+    last unless kill 0, $pid2;
+    sleep(1);
 }
 
-# If we get here, the test succeeded, otherwise it will loop endlessly.
-
-check(1);
+# Okay if we returned before the 10 secs expired
+check($i<10);
