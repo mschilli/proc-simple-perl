@@ -7,7 +7,7 @@ package Proc::Simple;
 # modify it under the same terms as Perl itself.
 #
 # The newest version of this module is available on
-#     http://perlmeister.com/CPAN/procsimple
+#     http://perlmeister.com/devel
 # or on your favourite CPAN site under
 #     CPAN/modules/by-author/id/MSCHILLI
 #
@@ -115,13 +115,17 @@ The following methods are available:
 
 =over 4
 
-=item new
+=item new (Constructor)
 
-Create a new instance of this class
+Create a new instance of this class by writing
 
   $proc = new Proc::Simple;
 
-Takes no arguments.
+or
+
+  $proc = Proc::Simple->new();
+
+It takes no arguments.
 
 =cut
 
@@ -129,7 +133,9 @@ Takes no arguments.
 # $proc_obj=Proc::Simple->new(); - Constructor
 ######################################################################
 sub new { 
-  my $class = shift;
+  my $proto = shift;
+  my $class = ref($proto) || $proto;
+
   my $self  = {};
   
   # Init instance variables
@@ -144,9 +150,19 @@ sub new {
 
 =item start
 
-Launch new process.
+Launch a new process. For an external program to be started like
+from the shell, call
 
- $status = $proc->start("prg");
+ $status = $proc->start("program-name");
+
+If, on the other hand, you want to start execution of a Perl function
+in the background, simply provide the function reference like
+
+ $status = $proc->start(\&perl_function);
+
+or supply an unnamed subroutine:
+
+ $status = $proc->start( sub { sleep(1) } );
 
 The I<start> Method returns immediately after starting the
 specified process in background, i.e. non-blocking mode.
@@ -256,26 +272,13 @@ sub kill {
   1;
 }
 
-=item kill_on_destroy
-
-Set a flag to determine whether the process attached
-to this object should be killed when the object is
-destroyed. By default this flag is set to true.
-The current value is returned.
-
-  $current = $proc->kill_on_destroy;
-  $proc->kill_on_destroy(1); # Set flag to true
-  $proc->kill_on_destroy(0); # Set flag to false
-
-=cut
-
 ######################################################################
 
 =item kill_on_destroy
 
 Set a flag to determine whether the process attached
 to this object should be killed when the object is
-destroyed. By default this flag is set to true.
+destroyed. By default, this flag is set to false.
 The current value is returned.
 
   $current = $proc->kill_on_destroy;
@@ -312,8 +315,8 @@ kill_on_destroy is true). Returns the current setting.
 ######################################################################
 sub signal_on_destroy {
     my $self = shift;
-    if (@_) { $self->{Sig_on_destroy} = shift; }
-    return $self->{Sig_on_destroy};
+    if (@_) { $self->{signal_on_destroy} = shift; }
+    return $self->{signal_on_destroy};
 }
 
 ######################################################################
@@ -341,7 +344,7 @@ sub pid {
 
 ######################################################################
 
-=item DESTROY
+=item DESTROY (Destructor)
 
 Object destructor. This method is called when the
 object is destroyed (eg with "undef" or on exiting
@@ -465,6 +468,6 @@ it, this is the time to upgrade! Get 5.005_02 or better.
 Michael Schilli <michael@perlmeister.com>
 
 Tim Jenness  <t.jenness@jach.hawaii.edu>
-   did kill_on_destroy/signal_on_destroy
+   did kill_on_destroy/signal_on_destroy/pid
 
 =cut
