@@ -23,6 +23,7 @@
 
 
 use Proc::Simple;
+Proc::Simple::debug(1);
 
 ###
 ### check(1) -> print #testno ok
@@ -70,7 +71,6 @@ print "Result should equal 1 if process was killed by us: $result\n";
 # Now try the same thing with the kill_on_destroy flag set
 
 $psh  = Proc::Simple->new();
-
 
 check($psh->start($coderef));         # 3
 

@@ -1,5 +1,5 @@
 
-Module:   Proc::Simple.pm    Version 1.14 (09/06/99)
+Module:   Proc::Simple.pm    Version 1.15 (10/16/00)
 
 Author:   Michael Schilli
 
@@ -36,9 +36,14 @@ Synopsis:
 
           $myproc->kill("SIGUSR1");             # Send specified signal
 
+          $myproc->exit_status();               # Return exit status of process
+
           Proc::Simple::debug($level);          # Turn debug on
 
 Changes:       
+          from 1.14: Added exit_status() method and a smart
+                     REAPER which reaps only processes we've started before.
+
           from 1.13: Replaced two erronous uses of 'exists' by 'defined'.
                      Thanks to Rolf.Beutner@telekom.de for pointing this
                      out.
@@ -55,11 +60,9 @@ Changes:
           from 1.1:  Process is now called Proc::Simple to fit in the
                      CPAN namespace, corrections Andreas Koenig suggested.
 
-Release Date:  96/05/22
-Latest Update: 99/09/06
+First Release:  05/22/96
 
-Requirements:  Perl 5.003
-
+Requirements:  Perl 5.6.0
 
 Manpages:      Embedded in Proc::Simple.pm as usual, just call:
 
@@ -72,7 +75,7 @@ Installation:
 	       make test
 	       make install
 
-Copyright:     (c) 1996-1999 Michael Schilli. All rights reserved. This 
+Copyright:     (c) 1996-2000 Michael Schilli. All rights reserved. This 
                program is free software, you can redistribute it and/or 
                modify it under the same terms as Perl itself.
 

@@ -1,7 +1,7 @@
 ######################################################################
 package Proc::Simple;
 ######################################################################
-# Copyright 1996-1999 by Michael Schilli, all rights reserved.
+# Copyright 1996-2000 by Michael Schilli, all rights reserved.
 #
 # This program is free software, you can redistribute it and/or 
 # modify it under the same terms as Perl itself.
@@ -38,6 +38,8 @@ Proc::Simple -- launch and control background processes
 
 
    $myproc->kill("SIGUSR1");             # Send specified signal
+
+   $myproc->exit_status();               # Return exit status of process
 
 
    Proc::Simple::debug($level);          # Turn debug on
@@ -93,13 +95,13 @@ signal_on_destroy methods).
 
 require 5.003;
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS);
 
 require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -183,13 +185,17 @@ sub start {
 
   # Fork a child process
   if(($self->{'pid'}=fork()) == 0) { # Child
+
       if(ref($func) eq "CODE") {
 	  &$func; exit 0;            # Start perl subroutine
       } else {
-          exec "$func";              # Start Shell-Process
+          exec $func;                # Start shell process
+          exit 0;                    # In case something goes wrong
       }
   } elsif($self->{'pid'} > 0) {      # Parent:
       $self->dprt("START($self->{'pid'})");
+      # Register PID
+      $EXIT_STATUS{$self->{'pid'}} = undef;
       return 1;                      #   return OK
   } else {                           # Fork Error:
       return 0;                      #   return Error
@@ -214,6 +220,12 @@ and returns I<1> if it is, I<0> if it's not.
 ######################################################################
 sub poll {
   my $self = shift;
+
+  # There's some weirdness going on with the signal handler. 
+  # It runs into timing problems, so let's have poll() call
+  # the REAPER every time to make sure we're getting rid of 
+  # defuncts.
+  $self->THE_REAPER();
 
   if(defined($self->{'pid'})) {
       if(kill(0, $self->{'pid'})) {
@@ -370,9 +382,29 @@ sub DESTROY {
         if (defined $self->signal_on_destroy) {
             $self->kill($self->signal_on_destroy);
         } else {
+            $self->dprt("Sending KILL");
             $self->kill;
         }
     }
+    delete $EXIT_STATUS{ $self->pid };
+}
+
+######################################################################
+
+=item exit_status
+
+Returns the exit status of the process as the $! variable indicates.
+If the process is still running, C<undef> is returned.
+
+=cut
+
+######################################################################
+# returns the exit status of the child process, undef if the child
+# hasn't yet exited
+######################################################################
+sub exit_status{
+        my( $self ) = @_;
+        return $EXIT_STATUS{ $self->pid };
 }
 
 ######################################################################
@@ -383,11 +415,22 @@ sub THE_REAPER {
     my $child;
 
     if(defined $WNOHANG) {
-        while (0 < ($child = waitpid(-1, $WNOHANG))) {
-            dprt("", "Reaper: $child");
+        # Try to reap every process we've ever started and 
+        # whichs Proc::Simple object hasn't been destroyed
+        foreach my $pid (keys %EXIT_STATUS) {
+            dprt("", "Trying to reap $pid");
+            next if defined $EXIT_STATUS{$pid};
+            if(my $res = waitpid($pid, $WNOHANG) > 0) {
+                # We reaped a truly running process
+                $EXIT_STATUS{$pid} = $?;
+                dprt("", "Reaped: $pid");
+            } else {
+                dprt("", "waitpid returned $res");
+            }
         }
     } else { 
-        wait();
+        $child = wait();
+        $EXIT_STATUS{$child} = $?;
     }
 
     # Reset signal handler for crappy sysV systems
@@ -469,5 +512,8 @@ Michael Schilli <michael@perlmeister.com>
 
 Tim Jenness  <t.jenness@jach.hawaii.edu>
    did kill_on_destroy/signal_on_destroy/pid
+
+Mark R. Southern <mark_southern@merck.com>
+   worked on EXIT_STATUS tracking
 
 =cut
