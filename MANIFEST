@@ -4,6 +4,7 @@ README
 Simple.pm
 t/simple.t
 t/mult.t
+t/muarg.t
 t/exit.t
 t/esub.t
 t/destroy.t
