@@ -2,6 +2,9 @@
     Proc::Simple CHANGES
 ######################################################################
 
+          from 1.19: Fixed bug which occurred on failed fork()s, as 
+                     reported anonymously on the CPAN bug tracker.
+
           from 1.18: Added multi-arg start method (proposed by
                      Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu>)
 

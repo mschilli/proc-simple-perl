@@ -114,7 +114,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -237,7 +237,10 @@ sub start {
   $SIG{'CHLD'} = \&THE_REAPER;
 
   # Fork a child process
-  if(($self->{'pid'}=fork()) == 0) { # Child
+  $self->{'pid'} = fork();
+  return 0 unless defined $self->{'pid'};  #   return Error if fork failed
+
+  if($self->{pid} == 0) { # Child
 
       if(ref($func) eq "CODE") {
 	  $func->(@params); exit 0;            # Start perl subroutine
@@ -250,8 +253,8 @@ sub start {
       # Register PID
       $EXIT_STATUS{$self->{'pid'}} = undef;
       return 1;                      #   return OK
-  } else {                           # Fork Error:
-      return 0;                      #   return Error
+  } else {      
+      return 0;                      #   this shouldn't occur
   }
 }
 
