@@ -43,6 +43,8 @@ Synopsis:
 Changes:       
           from 1.16: Fixed bug with Proc::Simple instances which
                      were DESTROYED before they were ever started.
+                     Many thanks to Russell Fulton (r.fulton@auckland.ac.nz)
+                     for pointing this out.
 
           from 1.15: Added %DESTROYED hash for processes which might
                      still in zombie state right after their objects
