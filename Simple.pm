@@ -110,6 +110,7 @@ use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS 
             %DESTROYED);
 
+use IO::Handle;
 require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
@@ -247,11 +248,13 @@ sub start {
       if (defined $self->{'redirect_stderr'}) {
         $self->dprt("STDERR -> $self->{'redirect_stderr'}");
         open(STDERR, ">$self->{'redirect_stderr'}") ;
+        autoflush STDERR 1 ;
       }
 
       if (defined $self->{'redirect_stdout'}) {
         $self->dprt("STDOUT -> $self->{'redirect_stdout'}");
         open(STDOUT, ">$self->{'redirect_stdout'}") ;
+        autoflush STDOUT 1 ;
       }
 
       if(ref($func) eq "CODE") {
