@@ -305,7 +305,7 @@ process when the object is destroyed (Assuming
 kill_on_destroy is true). Returns the current setting.
 
   $current = $proc->signal_on_destroy;
-  $proc->signal_on_destory("KILL");
+  $proc->signal_on_destroy("KILL");
 
 =cut
 
