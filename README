@@ -1,5 +1,5 @@
 
-Module:        Proc::Simple.pm    Version 1.12
+Module:        Proc::Simple.pm    Version 1.13
 
 Author:        Michael Schilli
 
@@ -32,14 +32,22 @@ Logic:
                $myproc->kill();                      # Terminate 
 
 
-Changes:       from 1.1:  Process is now called Proc::Simple to fit in the
-                          CPAN namespace, corrections Andreas Koenig suggested.
+Changes:       
+               from 1.12: To fight problems with zombies, replaced the wait()
+                          function by a NOWAIT waitpid on systems that 
+                          support it.
+
+                          Tim Jenness' <t.jenness@jach.hawaii.edu> included
+                          kill_on_destroy/sig_on_destroy/pid methods.
+
                from 1.11: binkley's error: threw out waitpid, wait is
 			  performed by signal handler now.
+               from 1.1:  Process is now called Proc::Simple to fit in the
+                          CPAN namespace, corrections Andreas Koenig suggested.
 
 Release Date:  96/05/22
 
-Requirements:  Perl 5.002
+Requirements:  Perl 5.003
 
 
 Manpages:      Embedded in Proc/Simple.pm as usual:
@@ -53,10 +61,10 @@ Installation:
 	       make test
 	       make install
 
-Copyright:     (c) 1996 Michael Schilli. All rights reserved. This program
-               is free software, you can redistribute it and/or modify it
-               under the same terms as Perl itself.
+Copyright:     (c) 1996-1999 Michael Schilli. All rights reserved. This 
+               program is free software, you can redistribute it and/or 
+               modify it under the same terms as Perl itself.
 
 Have fun!
 
-Michael Schilli schilli@tep.e-technik.tu-muenchen.de
+Michael Schilli mschilli@perlmeister.com
