@@ -12,6 +12,6 @@ $ftp->login("perlmeis", "zztop2121") || die "Login failed";
 
 $ftp->cwd($dir) || die "Directory $dir doesn't exist";
 $ftp->binary();
-$ftp->put("Proc-Simple-1.13.tar.gz") || die "Cannot put";
+$ftp->put("Proc-Simple-1.14.tar.gz") || die "Cannot put";
 
 $ftp->quit();
