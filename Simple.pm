@@ -376,6 +376,10 @@ signal (SIGTERM if undefined).
 sub DESTROY {
     my $self = shift;
 
+    # Processes never started don't have to be cleaned up in
+    # any special way.
+    return unless $self->pid();
+
     # If the kill_on_destroy flag is true then
     # We need to send a signal to the process
     if ($self->kill_on_destroy) {
