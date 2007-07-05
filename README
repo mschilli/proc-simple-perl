@@ -1,5 +1,5 @@
 ######################################################################
-    Proc::Simple 1.21
+    Proc::Simple 1.22
 ######################################################################
 
 NAME
@@ -20,6 +20,8 @@ SYNOPSIS
                       $param, ...);          # with parameters
 
        $running = $myproc->poll();           # Poll Running Process
+
+       $exit_status = $myproc->wait();       # Wait until process is done
 
        $proc->kill_on_destroy(1);            # Set kill on destroy
        $proc->signal_on_destroy("KILL");     # Specify signal to be sent
@@ -220,6 +222,13 @@ METHODS
     exit_status
         Returns the exit status of the process as the $! variable indicates.
         If the process is still running, "undef" is returned.
+
+    wait
+        The *wait* method:
+
+           $exit_status = $myproc->wait();
+
+        waits until the process is done and returns its exit status.
 
     debug
         Switches debug messages on and off -- Proc::Simple::debug(1)
