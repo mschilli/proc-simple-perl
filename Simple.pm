@@ -698,4 +698,6 @@ Tobias Jahn <tjahn@users.sourceforge.net>
 Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu>
 suggested the multi-arg start()-methods.
 
+Chip Capelik contributed a patch with the wait() method.
+
 =cut
