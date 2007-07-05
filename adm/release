@@ -10,9 +10,3 @@ use strict;
 use ModDevUtils;
 
 ModDevUtils::release() or exit 0;
-
-my $ball = ModDevUtils::tarball_name();
-print "Copying $ball to perlmeister.com ...\n";
-system("scp $ball perlmeis\@sprite.netnation.com:/home/perlmeis/tmp");
-print "Releasing it on perlmeister.com ...\n";
-system("ssh -l perlmeis sprite.netnation.com bin/rel $ball\n");
