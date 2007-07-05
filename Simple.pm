@@ -34,6 +34,8 @@ Proc::Simple -- launch and control background processes
 
    $running = $myproc->poll();           # Poll Running Process
 
+   $exit_status = $myproc->wait();       # Wait until process is done
+
    $proc->kill_on_destroy(1);            # Set kill on destroy
    $proc->signal_on_destroy("KILL");     # Specify signal to be sent
                                          # on destroy
@@ -115,7 +117,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -301,7 +303,7 @@ sub poll {
   if(defined($self->{'pid'})) {
       if(kill(0, $self->{'pid'})) {
           $self->dprt("POLL($self->{'pid'}) RESPONDING");
-	  return 1;
+	      return 1;
       } else {
           $self->dprt("POLL($self->{'pid'}) NOT RESPONDING");
       }
@@ -514,6 +516,45 @@ sub exit_status{
 }
 
 ######################################################################
+
+=item wait
+
+The I<wait> method:
+
+   $exit_status = $myproc->wait();
+
+waits until the process is done and returns its exit status.
+
+=cut
+
+######################################################################
+# waits until the child process terminates and then
+# returns the exit status of the child process.
+######################################################################
+sub wait {
+    my $self = shift;
+
+    local $SIG{CHLD}; # disable until we're done
+
+    my $pid = $self->pid();
+
+    # test if the signal handler reap'd this pid some time earlier or even just
+    # a split second before localizing $SIG{CHLD} above; also kickout if
+    # they've wait'd or waitpid'd on this pid before ...
+
+    return $EXIT_STATUS{$pid} if defined $EXIT_STATUS{$pid};
+
+    # all systems support FLAGS==0 (accg to: perldoc -f waitpid)
+    my $res = waitpid $pid, 0;
+    my $rc = $?;
+
+    $EXIT_STATUS{$pid} = $rc;
+    dprt("", "For $pid, reaped '$res' with exit_status=$rc");
+
+    return $rc;
+}
+
+######################################################################
 # Reaps processes, uses the magic WNOHANG constant
 ######################################################################
 sub THE_REAPER {
@@ -555,13 +596,13 @@ sub THE_REAPER {
                 $EXIT_STATUS{$pid} = $?;
                 dprt("", "Reaped: $pid");
             } else {
-                dprt("", "waitpid returned $res");
+                dprt("", "waitpid returned '$res'");
             }
         }
     } else { 
         # If we don't have $WNOHANG, we don't have a choice anyway.
         # Just reap everything.
-        $child = wait();
+        $child = CORE::wait();
         $EXIT_STATUS{$child} = $?;
     }
 
