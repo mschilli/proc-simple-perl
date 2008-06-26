@@ -109,7 +109,7 @@ signal_on_destroy methods).
 
 require 5.003;
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS 
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS %INTERVAL
             %DESTROYED);
 
 use IO::Handle;
@@ -117,7 +117,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -266,9 +266,11 @@ sub start {
           exit 0;                    # In case something goes wrong
       }
   } elsif($self->{'pid'} > 0) {      # Parent:
+      $INTERVAL{$self->{'pid'}}{'t0'} = time();
       $self->dprt("START($self->{'pid'})");
       # Register PID
       $EXIT_STATUS{$self->{'pid'}} = undef;
+      $INTERVAL{$self->{'pid'}}{'t1'} = undef;
       return 1;                      #   return OK
   } else {      
       return 0;                      #   this shouldn't occur
@@ -459,6 +461,42 @@ sub pid {
 
 ######################################################################
 
+=item t0
+
+Returns the start time() of the forked process associated with
+this object
+
+  $pid = $proc->t0();
+
+=cut
+
+######################################################################
+sub t0 {
+######################################################################
+  my $self = shift;
+
+  return $INTERVAL{$self->{'pid'}}{'t0'};
+}
+
+######################################################################
+
+=item t1
+
+Returns the stop time() of the forked process associated with
+this object
+
+  return $proc->t1()
+
+=cut
+
+######################################################################
+sub t1 {
+######################################################################
+  my $self = shift;
+
+  return $INTERVAL{$self->{'pid'}}{'t1'};
+}
+
 =item DESTROY (Destructor)
 
 Object destructor. This method is called when the
@@ -548,6 +586,7 @@ sub wait {
     my $res = waitpid $pid, 0;
     my $rc = $?;
 
+    $INTERVAL{$pid}{'t1'} = time();
     $EXIT_STATUS{$pid} = $rc;
     dprt("", "For $pid, reaped '$res' with exit_status=$rc");
 
@@ -560,6 +599,7 @@ sub wait {
 sub THE_REAPER {
 
     my $child;
+    my $now = time();
 
     if(defined $WNOHANG) {
         # Try to reap every process we've ever started and 
@@ -594,6 +634,7 @@ sub THE_REAPER {
             if(my $res = waitpid($pid, $WNOHANG) > 0) {
                 # We reaped a truly running process
                 $EXIT_STATUS{$pid} = $?;
+                $INTERVAL{$pid}{'t1'} = $now;
                 dprt("", "Reaped: $pid");
             } else {
                 dprt("", "waitpid returned '$res'");
@@ -604,6 +645,7 @@ sub THE_REAPER {
         # Just reap everything.
         $child = CORE::wait();
         $EXIT_STATUS{$child} = $?;
+        $INTERVAL{$child}{'t1'} = $now;
     }
 
     # Don't reset signal handler for crappy sysV systems. Screw them.
@@ -699,5 +741,7 @@ Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu>
 suggested the multi-arg start()-methods.
 
 Chip Capelik contributed a patch with the wait() method.
+
+Jeff Holt provided a patch for time tracking with t0() and t1().
 
 =cut
