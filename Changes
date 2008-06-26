@@ -2,6 +2,9 @@
     Proc::Simple CHANGES
 ######################################################################
 
+          from 1.22: Applied patch by Jeff Holt, providing start
+                     and end time of the forked process via t0() and t1().
+
           from 1.21: Added patch by Chip Capelik to provide a wait()
                      method waiting for a process to terminate.
 
