@@ -1,5 +1,5 @@
 ######################################################################
-    Proc::Simple 1.22
+    Proc::Simple 1.23
 ######################################################################
 
 NAME
@@ -213,6 +213,16 @@ METHODS
 
           $pid = $proc->pid;
 
+    t0  Returns the start time() of the forked process associated with this
+        object
+
+          $pid = $proc->t0();
+
+    t1  Returns the stop time() of the forked process associated with this
+        object
+
+          return $proc->t1()
+
     DESTROY (Destructor)
         Object destructor. This method is called when the object is
         destroyed (eg with "undef" or on exiting perl). If kill_on_destroy
@@ -263,4 +273,6 @@ AUTHOR
         multi-arg start()-methods.
 
         Chip Capelik contributed a patch with the wait() method.
+
+        Jeff Holt provided a patch for time tracking with t0() and t1().
 
