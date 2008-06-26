@@ -13,4 +13,5 @@ t/muarg.t
 t/mult.t
 t/simple.t
 t/stdouterr.t
+t/time.t
 t/wait.t
