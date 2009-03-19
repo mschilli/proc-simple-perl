@@ -2,6 +2,8 @@
     Proc::Simple CHANGES
 ######################################################################
 
+          from 1.23: Applied doc patch by Janne Chr. Schulz
+
           from 1.22: Applied patch by Jeff Holt, providing start
                      and end time of the forked process via t0() and t1().
 

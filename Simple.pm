@@ -117,7 +117,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -466,7 +466,7 @@ sub pid {
 Returns the start time() of the forked process associated with
 this object
 
-  $pid = $proc->t0();
+  $t0 = $proc->t0();
 
 =cut
 
@@ -485,7 +485,7 @@ sub t0 {
 Returns the stop time() of the forked process associated with
 this object
 
-  return $proc->t1()
+  $t1 = $proc->t1();
 
 =cut
 
