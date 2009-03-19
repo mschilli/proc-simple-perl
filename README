@@ -1,5 +1,5 @@
 ######################################################################
-    Proc::Simple 1.23
+    Proc::Simple 1.24
 ######################################################################
 
 NAME
@@ -216,12 +216,12 @@ METHODS
     t0  Returns the start time() of the forked process associated with this
         object
 
-          $pid = $proc->t0();
+          $t0 = $proc->t0();
 
     t1  Returns the stop time() of the forked process associated with this
         object
 
-          return $proc->t1()
+          $t1 = $proc->t1();
 
     DESTROY (Destructor)
         Object destructor. This method is called when the object is
