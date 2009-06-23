@@ -722,6 +722,11 @@ repeatedly with the I<poll> routine after sending the signal.
 I'd recommend using perl 5.6.0 although it might also run with 5.003
 -- if you don't have it, this is the time to upgrade!
 
+LEGALESE
+Copyright 1996 by Mike Schilli, all rights reserved. This program is
+free software, you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
 =head1 AUTHOR
 
 Michael Schilli <michael@perlmeister.com>
