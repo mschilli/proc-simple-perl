@@ -516,6 +516,10 @@ signal (SIGTERM if undefined).
 sub DESTROY {
     my $self = shift;
 
+    # Localize special variables so that the exit status from waitpid
+    # doesn't leak out, causing exit status to be incorrect.
+    local( $., $@, $!, $^E, $? );
+
     # Processes never started don't have to be cleaned up in
     # any special way.
     return unless $self->pid();
@@ -597,6 +601,10 @@ sub wait {
 # Reaps processes, uses the magic WNOHANG constant
 ######################################################################
 sub THE_REAPER {
+
+    # Localize special variables so that the exit status from waitpid
+    # doesn't leak out, causing exit status to be incorrect.
+    local( $., $@, $!, $^E, $? );
 
     my $child;
     my $now = time();
