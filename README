@@ -280,3 +280,5 @@ AUTHOR
 
         Jeff Holt provided a patch for time tracking with t0() and t1().
 
+        Brad Cavanagh fixed RT33440 (unreliable $?)
+
