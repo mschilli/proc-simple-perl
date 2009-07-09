@@ -117,7 +117,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -756,5 +756,7 @@ suggested the multi-arg start()-methods.
 Chip Capelik contributed a patch with the wait() method.
 
 Jeff Holt provided a patch for time tracking with t0() and t1().
+
+Brad Cavanagh fixed RT33440 (unreliable $?)
 
 =cut
