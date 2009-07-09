@@ -4,7 +4,7 @@
 
           from 1.25: Localize special variables so that the exit status 
                      from waitpid doesn't leak out, causing exit status 
-                     to be incorrect (by Brad Cavanagh).
+                     to be incorrect (RT33440, fixed by Brad Cavanagh).
 
           from 1.24: Added copyright header
 
