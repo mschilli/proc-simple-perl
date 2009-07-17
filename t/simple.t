@@ -33,7 +33,7 @@ print "1..10\n";
 
 $psh  = Proc::Simple->new();
 
-check($psh->start("sleep 0"));         # 1
+check($psh->start("sleep 1"));         # 1
 while($psh->poll) { 
     sleep 1; }
 check(!$psh->poll());                  # 2 Must have been terminated
@@ -50,7 +50,7 @@ check(!$psh->poll());                  # 5 Must have been terminated
 ### Perl subroutines
 $psub  = Proc::Simple->new();
 
-check($psub->start(sub { sleep 0 }));  # 6
+check($psub->start(sub { sleep 1 }));  # 6
 while($psub->poll) { 
     sleep 1; }
 check(!$psub->poll());                 # 7 Must have been terminated

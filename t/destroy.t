@@ -23,6 +23,7 @@
 
 
 use Proc::Simple;
+#Proc::Simple::debug(1);
 
 ###
 ### check(1) -> print #testno ok
@@ -71,7 +72,6 @@ print "Result should equal 1 if process was killed by us: $result\n";
 
 $psh  = Proc::Simple->new();
 
-
 check($psh->start($coderef));         # 3
 
 # Retrieve the process id (so that we can look for it later)
@@ -81,20 +81,17 @@ my $pid2 = $psh->pid;
 # Set flag
 $psh->kill_on_destroy(1);
 
-# Destroy object - process should still be running
+# Destroy object - after that, process should terminate
 undef $psh;
 
 # Process should no longer be running
 # The sleep makes sure that the process has died by the time
 # we get there
-sleep 2;
-$result = kill "SIGTERM", $pid2;
-
-print "Result should equal 0 if process was killed by object: $result\n";
-
-# Sense of check is reversed.
-if ($result) {
-  check(0);
-} else {
-  check(1);
+$i = 0;
+while($i++ < 10) {
+    last unless kill 0, $pid2;
+    sleep(1);
 }
+
+# Okay if we returned before the 10 secs expired
+check($i<10);

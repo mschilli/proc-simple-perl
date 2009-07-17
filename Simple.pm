@@ -1,13 +1,13 @@
 ######################################################################
 package Proc::Simple;
 ######################################################################
-# Copyright 1996-1999 by Michael Schilli, all rights reserved.
+# Copyright 1996-2000 by Michael Schilli, all rights reserved.
 #
 # This program is free software, you can redistribute it and/or 
 # modify it under the same terms as Perl itself.
 #
 # The newest version of this module is available on
-#     http://perlmeister.com/CPAN/procsimple
+#     http://perlmeister.com/devel
 # or on your favourite CPAN site under
 #     CPAN/modules/by-author/id/MSCHILLI
 #
@@ -38,6 +38,8 @@ Proc::Simple -- launch and control background processes
 
 
    $myproc->kill("SIGUSR1");             # Send specified signal
+
+   $myproc->exit_status();               # Return exit status of process
 
 
    Proc::Simple::debug($level);          # Turn debug on
@@ -93,13 +95,13 @@ signal_on_destroy methods).
 
 require 5.003;
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS);
 
 require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.13';
+$VERSION = '1.15';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -115,13 +117,17 @@ The following methods are available:
 
 =over 4
 
-=item new
+=item new (Constructor)
 
-Create a new instance of this class
+Create a new instance of this class by writing
 
   $proc = new Proc::Simple;
 
-Takes no arguments.
+or
+
+  $proc = Proc::Simple->new();
+
+It takes no arguments.
 
 =cut
 
@@ -129,7 +135,9 @@ Takes no arguments.
 # $proc_obj=Proc::Simple->new(); - Constructor
 ######################################################################
 sub new { 
-  my $class = shift;
+  my $proto = shift;
+  my $class = ref($proto) || $proto;
+
   my $self  = {};
   
   # Init instance variables
@@ -144,9 +152,19 @@ sub new {
 
 =item start
 
-Launch new process.
+Launch a new process. For an external program to be started like
+from the shell, call
 
- $status = $proc->start("prg");
+ $status = $proc->start("program-name");
+
+If, on the other hand, you want to start execution of a Perl function
+in the background, simply provide the function reference like
+
+ $status = $proc->start(\&perl_function);
+
+or supply an unnamed subroutine:
+
+ $status = $proc->start( sub { sleep(1) } );
 
 The I<start> Method returns immediately after starting the
 specified process in background, i.e. non-blocking mode.
@@ -167,13 +185,17 @@ sub start {
 
   # Fork a child process
   if(($self->{'pid'}=fork()) == 0) { # Child
+
       if(ref($func) eq "CODE") {
 	  &$func; exit 0;            # Start perl subroutine
       } else {
-          exec "$func";              # Start Shell-Process
+          exec $func;                # Start shell process
+          exit 0;                    # In case something goes wrong
       }
   } elsif($self->{'pid'} > 0) {      # Parent:
       $self->dprt("START($self->{'pid'})");
+      # Register PID
+      $EXIT_STATUS{$self->{'pid'}} = undef;
       return 1;                      #   return OK
   } else {                           # Fork Error:
       return 0;                      #   return Error
@@ -199,7 +221,13 @@ and returns I<1> if it is, I<0> if it's not.
 sub poll {
   my $self = shift;
 
-  if(exists($self->{'pid'})) {
+  # There's some weirdness going on with the signal handler. 
+  # It runs into timing problems, so let's have poll() call
+  # the REAPER every time to make sure we're getting rid of 
+  # defuncts.
+  $self->THE_REAPER();
+
+  if(defined($self->{'pid'})) {
       if(kill(0, $self->{'pid'})) {
           $self->dprt("POLL($self->{'pid'}) RESPONDING");
 	  return 1;
@@ -243,7 +271,7 @@ sub kill {
   $sig = "SIGTERM" unless defined $sig;
 
   # Process initialized at all?
-  return 0 if !exists $self->{'pid'};
+  return 0 if !defined $self->{'pid'};
 
   # Send signal
   if(kill($sig, $self->{'pid'})) {
@@ -256,26 +284,13 @@ sub kill {
   1;
 }
 
-=item kill_on_destroy
-
-Set a flag to determine whether the process attached
-to this object should be killed when the object is
-destroyed. By default this flag is set to true.
-The current value is returned.
-
-  $current = $proc->kill_on_destroy;
-  $proc->kill_on_destroy(1); # Set flag to true
-  $proc->kill_on_destroy(0); # Set flag to false
-
-=cut
-
 ######################################################################
 
 =item kill_on_destroy
 
 Set a flag to determine whether the process attached
 to this object should be killed when the object is
-destroyed. By default this flag is set to true.
+destroyed. By default, this flag is set to false.
 The current value is returned.
 
   $current = $proc->kill_on_destroy;
@@ -302,7 +317,7 @@ process when the object is destroyed (Assuming
 kill_on_destroy is true). Returns the current setting.
 
   $current = $proc->signal_on_destroy;
-  $proc->signal_on_destory("KILL");
+  $proc->signal_on_destroy("KILL");
 
 =cut
 
@@ -312,8 +327,8 @@ kill_on_destroy is true). Returns the current setting.
 ######################################################################
 sub signal_on_destroy {
     my $self = shift;
-    if (@_) { $self->{Sig_on_destroy} = shift; }
-    return $self->{Sig_on_destroy};
+    if (@_) { $self->{signal_on_destroy} = shift; }
+    return $self->{signal_on_destroy};
 }
 
 ######################################################################
@@ -341,7 +356,7 @@ sub pid {
 
 ######################################################################
 
-=item DESTROY
+=item DESTROY (Destructor)
 
 Object destructor. This method is called when the
 object is destroyed (eg with "undef" or on exiting
@@ -367,9 +382,29 @@ sub DESTROY {
         if (defined $self->signal_on_destroy) {
             $self->kill($self->signal_on_destroy);
         } else {
+            $self->dprt("Sending KILL");
             $self->kill;
         }
     }
+    delete $EXIT_STATUS{ $self->pid };
+}
+
+######################################################################
+
+=item exit_status
+
+Returns the exit status of the process as the $! variable indicates.
+If the process is still running, C<undef> is returned.
+
+=cut
+
+######################################################################
+# returns the exit status of the child process, undef if the child
+# hasn't yet exited
+######################################################################
+sub exit_status{
+        my( $self ) = @_;
+        return $EXIT_STATUS{ $self->pid };
 }
 
 ######################################################################
@@ -380,15 +415,41 @@ sub THE_REAPER {
     my $child;
 
     if(defined $WNOHANG) {
-        while (0 < ($child = waitpid(-1, $WNOHANG))) {
-            dprt("", "Reaper: $child");
+        # Try to reap every process we've ever started and 
+        # whichs Proc::Simple object hasn't been destroyed.
+        #
+        # This is getting really ugly. But if we just call the REAPER
+        # for every SIG{CHLD} event, code like this will fail:
+        #
+        # use Proc::Simple;
+        # $proc = Proc::Simple->new(); $proc->start(\&func); sleep(5);
+        # sub func { open(PIPE, "/bin/ls |"); @a = <PIPE>; sleep(1); 
+        #            close(PIPE) or die "PIPE failed"; }
+        # 
+        # Reason: close() doesn't like it if the spawn has
+        # been reaped already. Oh well.
+        #
+        foreach my $pid (keys %EXIT_STATUS) {
+            dprt("", "Trying to reap $pid");
+            next if defined $EXIT_STATUS{$pid};
+            if(my $res = waitpid($pid, $WNOHANG) > 0) {
+                # We reaped a truly running process
+                $EXIT_STATUS{$pid} = $?;
+                dprt("", "Reaped: $pid");
+            } else {
+                dprt("", "waitpid returned $res");
+            }
         }
     } else { 
-        wait();
+        # If we don't have $WNOHANG, we don't have a choice anyway.
+        # Just reap everything.
+        $child = wait();
+        $EXIT_STATUS{$child} = $?;
     }
 
-    # Reset signal handler for crappy sysV systems
-    $SIG{'CHLD'} = \&THE_REAPER;
+    # Don't reset signal handler for crappy sysV systems. Screw them.
+    # This caused problems with Irix 6.2
+    # $SIG{'CHLD'} = \&THE_REAPER;
 }
 
 ######################################################################
@@ -457,14 +518,17 @@ repeatedly with the I<poll> routine after sending the signal.
 
 =head1 Requirements
 
-I'd recommend using at least perl 5.003 -- if you don't have 
-it, this is the time to upgrade! Get 5.005_02 or better.
+I'd recommend using perl 5.6.0 although it might also run with 5.003
+also -- if you don't have it, this is the time to upgrade!
 
 =head1 AUTHORS
 
 Michael Schilli <michael@perlmeister.com>
 
 Tim Jenness  <t.jenness@jach.hawaii.edu>
-   did kill_on_destroy/signal_on_destroy
+   did kill_on_destroy/signal_on_destroy/pid
+
+Mark R. Southern <mark_southern@merck.com>
+   worked on EXIT_STATUS tracking
 
 =cut
