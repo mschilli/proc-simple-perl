@@ -1,5 +1,5 @@
 ######################################################################
-    Proc::Simple 1.26
+    Proc::Simple 1.27
 ######################################################################
 
 NAME
@@ -29,9 +29,12 @@ SYNOPSIS
 
        $myproc->kill();                      # Kill Process (SIGTERM)
 
+
+
        $myproc->kill("SIGUSR1");             # Send specified signal
 
        $myproc->exit_status();               # Return exit status of process
+
 
        Proc::Simple::debug($level);          # Turn debug on
 
@@ -106,56 +109,54 @@ METHODS
         self-defined subroutines (like "foo()") in a new process.
 
   Starting External Programs
-        For an external program to be started, call
+    For an external program to be started, call
 
-         $status = $proc->start("program-name");
+     $status = $proc->start("program-name");
 
-        If you want to pass a couple of parameters to the launched program,
-        there's two options: You can either pass them in one argument like
-        in
+    If you want to pass a couple of parameters to the launched program,
+    there's two options: You can either pass them in one argument like in
 
-         $status = $proc->start("/bin/echo hello world");
+     $status = $proc->start("/bin/echo hello world");
 
-        or in several arguments like in
+    or in several arguments like in
 
-         $status = $proc->start("/bin/echo", "hello", "world");
+     $status = $proc->start("/bin/echo", "hello", "world");
 
-        Just as in Perl's function "system()", there's a big difference
-        between the two methods: If you provide one argument containing a
-        blank-separated command line, your shell is going to process any
-        meta-characters (if you choose to use some) before the process is
-        actually launched:
+    Just as in Perl's function "system()", there's a big difference between
+    the two methods: If you provide one argument containing a
+    blank-separated command line, your shell is going to process any
+    meta-characters (if you choose to use some) before the process is
+    actually launched:
 
-         $status = $proc->start("/bin/ls -l /etc/initt*");
+     $status = $proc->start("/bin/ls -l /etc/initt*");
 
-        will expand "/etc/initt*" to "/etc/inittab" before running the "ls"
-        command. If, on the other hand, you say
+    will expand "/etc/initt*" to "/etc/inittab" before running the "ls"
+    command. If, on the other hand, you say
 
-         $status = $proc->start("/bin/ls", "-l", "*");
+     $status = $proc->start("/bin/ls", "-l", "*");
 
-        the "*" will stay unexpanded, meaning you'll look for a file with
-        the literal name "*" (which is unlikely to exist on your system
-        unless you deliberately create confusingly named files :). For more
-        info on this, look up "perldoc -f exec".
+    the "*" will stay unexpanded, meaning you'll look for a file with the
+    literal name "*" (which is unlikely to exist on your system unless you
+    deliberately create confusingly named files :). For more info on this,
+    look up "perldoc -f exec".
 
   Starting Subroutines
-        If, on the other hand, you want to start a Perl subroutine in the
-        background, simply provide the function reference like
+    If, on the other hand, you want to start a Perl subroutine in the
+    background, simply provide the function reference like
 
-         $status = $proc->start(\&your_function);
+     $status = $proc->start(\&your_function);
 
-        or supply an unnamed subroutine:
+    or supply an unnamed subroutine:
 
-         $status = $proc->start( sub { sleep(1) } );
+     $status = $proc->start( sub { sleep(1) } );
 
-        You can also provide additional parameters to be passed to the
-        function:
+    You can also provide additional parameters to be passed to the function:
 
-         $status = $proc->start(\&printme, "hello", "world");
+     $status = $proc->start(\&printme, "hello", "world");
 
-        The *start* Method returns immediately after starting the specified
-        process in background, i.e. non-blocking mode. It returns *1* if the
-        process has been launched sucessfully and *0* if not.
+    The *start* Method returns immediately after starting the specified
+    process in background, i.e. non-blocking mode. It returns *1* if the
+    process has been launched sucessfully and *0* if not.
 
     poll
         The *poll* method checks if the process is still running
@@ -196,7 +197,8 @@ METHODS
 
     redirect_output
         This allows to redirect the stdout and/or stderr output to a file.
-        Specify undef to leave th
+        Specify undef to leave the stderr/stdout handles of the process
+        alone.
 
           # stdout to a file, left stderr unchanged
           $proc->redirect_output ("/tmp/someapp.stdout", undef);
@@ -245,40 +247,52 @@ METHODS
         switches them on, Proc::Simple::debug(0) keeps Proc::Simple quiet.
 
 NOTE
-        Please keep in mind that there is no guarantee that the SIGTERM
-        signal really terminates a process. Processes can have signal
-        handlers defined that avoid the shutdown. If in doubt, whether a
-        process still exists, check it repeatedly with the *poll* routine
-        after sending the signal.
+    Please keep in mind that there is no guarantee that the SIGTERM signal
+    really terminates a process. Processes can have signal handlers defined
+    that avoid the shutdown. If in doubt, whether a process still exists,
+    check it repeatedly with the *poll* routine after sending the signal.
 
 REQUIREMENTS
-        I'd recommend using perl 5.6.0 although it might also run with 5.003
-        -- if you don't have it, this is the time to upgrade!
+    I'd recommend using perl 5.6.0 although it might also run with 5.003 --
+    if you don't have it, this is the time to upgrade!
 
-        LEGALESE Copyright 1996 by Mike Schilli, all rights reserved. This
-        program is free software, you can redistribute it and/or modify it
-        under the same terms as Perl itself.
+    LEGALESE Copyright 1996 by Mike Schilli, all rights reserved. This
+    program is free software, you can redistribute it and/or modify it under
+    the same terms as Perl itself.
 
 AUTHOR
-        Michael Schilli <michael@perlmeister.com>
+    Michael Schilli <michael@perlmeister.com>
 
-        Contributors:
+    Contributors:
 
-        Tim Jenness <t.jenness@jach.hawaii.edu> did
-        kill_on_destroy/signal_on_destroy/pid
+    Tim Jenness <t.jenness@jach.hawaii.edu> did
+    kill_on_destroy/signal_on_destroy/pid
 
-        Mark R. Southern <mark_southern@merck.com> worked on EXIT_STATUS
-        tracking
+    Mark R. Southern <mark_southern@merck.com> worked on EXIT_STATUS
+    tracking
 
-        Tobias Jahn <tjahn@users.sourceforge.net> added redirection to
-        stdout/stderr
+    Tobias Jahn <tjahn@users.sourceforge.net> added redirection to
+    stdout/stderr
 
-        Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu> suggested the
-        multi-arg start()-methods.
+    Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu> suggested the
+    multi-arg start()-methods.
 
-        Chip Capelik contributed a patch with the wait() method.
+    Chip Capelik contributed a patch with the wait() method.
 
-        Jeff Holt provided a patch for time tracking with t0() and t1().
+    Jeff Holt provided a patch for time tracking with t0() and t1().
 
-        Brad Cavanagh fixed RT33440 (unreliable $?)
+    Brad Cavanagh fixed RT33440 (unreliable $?)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 178:
+        You forgot a '=back' before '=head2'
+
+    Around line 282:
+        '=item' outside of any '=over'
+
+    Around line 720:
+        You forgot a '=back' before '=head1'
 
