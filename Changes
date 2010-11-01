@@ -2,7 +2,7 @@
     Proc::Simple CHANGES
 ######################################################################
 
-          (not yet released): 
+          From 1.26: [RT 62285] Pod fix for redirect_output()
                      Fixed github link
 
           from 1.25: Localize special variables so that the exit status 
