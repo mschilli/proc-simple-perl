@@ -2,6 +2,9 @@
     Proc::Simple CHANGES
 ######################################################################
 
+          (not yet released)
+                     [RT 62802] Pod fix by Salvatore Bonaccorso
+
           From 1.26: [RT 62285] Pod fix for redirect_output()
                      Fixed github link
 

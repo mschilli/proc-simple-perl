@@ -79,7 +79,7 @@ or even as
 The I<start> Method returns immediately after starting the
 specified process in background, i.e. there's no blocking.
 It returns I<1> if the process has been launched
-sucessfully and I<0> if not.
+successfully and I<0> if not.
 
 The I<poll> method checks if the process is still running
 
@@ -227,7 +227,7 @@ You can also provide additional parameters to be passed to the function:
 The I<start> Method returns immediately after starting the
 specified process in background, i.e. non-blocking mode.
 It returns I<1> if the process has been launched
-sucessfully and I<0> if not.
+successfully and I<0> if not.
 
 =cut
 

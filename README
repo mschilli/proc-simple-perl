@@ -64,7 +64,7 @@ DESCRIPTION
 
     The *start* Method returns immediately after starting the specified
     process in background, i.e. there's no blocking. It returns *1* if the
-    process has been launched sucessfully and *0* if not.
+    process has been launched successfully and *0* if not.
 
     The *poll* method checks if the process is still running
 
@@ -156,7 +156,7 @@ METHODS
 
     The *start* Method returns immediately after starting the specified
     process in background, i.e. non-blocking mode. It returns *1* if the
-    process has been launched sucessfully and *0* if not.
+    process has been launched successfully and *0* if not.
 
     poll
         The *poll* method checks if the process is still running
