@@ -105,7 +105,7 @@ destroyed or if the process exits. By default this
 behaviour is turned off (see the kill_on_destroy and
 signal_on_destroy methods).
 
-=cut
+=cut 
 
 require 5.003;
 use strict;
@@ -117,7 +117,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -145,7 +145,7 @@ or
 
 It takes no arguments.
 
-=cut
+=cut 
 
 ######################################################################
 # $proc_obj=Proc::Simple->new(); - Constructor
@@ -174,8 +174,6 @@ Launches a new process.
 The C<start()> method can be used to launch both external programs 
 (like C</bin/echo>) or one of your self-defined subroutines
 (like C<foo()>) in a new process.
-
-=head2 Starting External Programs
 
 For an external program to be started, call
 
@@ -209,8 +207,6 @@ literal name C<*> (which is unlikely to exist on your system unless
 you deliberately create confusingly named files :). For
 more info on this, look up C<perldoc -f exec>.
 
-=head2 Starting Subroutines
-
 If, on the other hand, you want to start a Perl subroutine
 in the background, simply provide the function reference like
 
@@ -229,7 +225,7 @@ specified process in background, i.e. non-blocking mode.
 It returns I<1> if the process has been launched
 successfully and I<0> if not.
 
-=cut
+=cut 
 
 ######################################################################
 # $ret = $proc_obj->start("prg"); - Launch process
@@ -287,7 +283,7 @@ The I<poll> method checks if the process is still running
 
 and returns I<1> if it is, I<0> if it's not.
 
-=cut
+=cut 
 
 ######################################################################
 # $ret = $proc_obj->poll(); - Check process status
@@ -332,7 +328,7 @@ option, another signal can be specified.
 sends the SIGUSR1 signal to the running process. I<kill> returns I<1> if
 it succeeds in sending the signal, I<0> if it doesn't.
 
-=cut
+=cut 
 
 ######################################################################
 # $ret = $proc_obj->kill([SIGXXX]); - Send signal to process
@@ -372,7 +368,7 @@ The current value is returned.
   $proc->kill_on_destroy(1); # Set flag to true
   $proc->kill_on_destroy(0); # Set flag to false
 
-=cut
+=cut 
 
 ######################################################################
 # Method to set the kill_on_destroy flag
@@ -394,7 +390,7 @@ kill_on_destroy is true). Returns the current setting.
   $current = $proc->signal_on_destroy;
   $proc->signal_on_destroy("KILL");
 
-=cut
+=cut 
 
 ######################################################################
 # Send a signal on destroy
@@ -424,7 +420,7 @@ Specify undef to leave the stderr/stdout handles of the process alone.
 
 Call this method before running the start method.
 
-=cut
+=cut 
 
 ######################################################################
 sub redirect_output {
@@ -445,7 +441,7 @@ this object
 
   $pid = $proc->pid;
 
-=cut
+=cut 
 
 ######################################################################
 sub pid {
@@ -468,7 +464,7 @@ this object
 
   $t0 = $proc->t0();
 
-=cut
+=cut 
 
 ######################################################################
 sub t0 {
@@ -487,7 +483,7 @@ this object
 
   $t1 = $proc->t1();
 
-=cut
+=cut 
 
 ######################################################################
 sub t1 {
@@ -505,7 +501,7 @@ perl). If kill_on_destroy is true the process
 associated with the object is sent the signal_on_destroy
 signal (SIGTERM if undefined).
 
-=cut
+=cut 
 
 ######################################################################
 # Destroy method
@@ -548,7 +544,7 @@ sub DESTROY {
 Returns the exit status of the process as the $! variable indicates.
 If the process is still running, C<undef> is returned.
 
-=cut
+=cut 
 
 ######################################################################
 # returns the exit status of the child process, undef if the child
@@ -569,7 +565,7 @@ The I<wait> method:
 
 waits until the process is done and returns its exit status.
 
-=cut
+=cut 
 
 ######################################################################
 # waits until the child process terminates and then
@@ -670,7 +666,7 @@ sub THE_REAPER {
 Switches debug messages on and off -- Proc::Simple::debug(1) switches
 them on, Proc::Simple::debug(0) keeps Proc::Simple quiet.
 
-=cut
+=cut 
 
 # Proc::Simple::debug($level) - Turn debug on/off
 sub debug { $Debug = shift; }
@@ -719,6 +715,8 @@ sub get_system_nohang {
 
 __END__
 
+=back
+
 =head1 NOTE
 
 Please keep in mind that there is no guarantee that the SIGTERM
@@ -727,21 +725,7 @@ handlers defined that avoid the shutdown.
 If in doubt, whether a process still exists, check it
 repeatedly with the I<poll> routine after sending the signal.
 
-=head1 REQUIREMENTS
-
-I'd recommend using perl 5.6.0 although it might also run with 5.003
--- if you don't have it, this is the time to upgrade!
-
-LEGALESE
-Copyright 1996 by Mike Schilli, all rights reserved. This program is
-free software, you can redistribute it and/or modify it under the same
-terms as Perl itself.
-
-=head1 AUTHOR
-
-Michael Schilli <michael@perlmeister.com>
-
-Contributors:
+=head1 Contributors
 
 Tim Jenness  <t.jenness@jach.hawaii.edu>
    did kill_on_destroy/signal_on_destroy/pid
@@ -761,4 +745,13 @@ Jeff Holt provided a patch for time tracking with t0() and t1().
 
 Brad Cavanagh fixed RT33440 (unreliable $?)
 
-=cut
+=head1 AUTHOR
+
+    1996, Mike Schilli <cpan@perlmeister.com>
+    
+=head1 LICENSE
+
+Copyright 1996-2011 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
