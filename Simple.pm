@@ -536,7 +536,9 @@ sub DESTROY {
         }
     }
     delete $EXIT_STATUS{ $self->pid };
-    $DESTROYED{ $self->pid } = 1;
+    if( $self->poll() ) {
+        $DESTROYED{ $self->pid } = 1;
+    }
 }
 
 ######################################################################

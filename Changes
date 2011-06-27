@@ -2,8 +2,10 @@
     Proc::Simple CHANGES
 ######################################################################
 
-          (not yet released)
+          From 1.27:
                      [RT 62802] Pod fix by Salvatore Bonaccorso
+                     [RT 63833] Applied patch to stop reaping PIDs of 
+                       no longer existing processes (submitted by perlbotics).
 
           From 1.26: [RT 62285] Pod fix for redirect_output()
                      Fixed github link
