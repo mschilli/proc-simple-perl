@@ -41,5 +41,7 @@ foreach $i (@psh) {
     check(!$i->poll());                  
 }
 
+Proc::Simple->cleanup();
+
 1;
 

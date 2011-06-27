@@ -672,6 +672,29 @@ them on, Proc::Simple::debug(0) keeps Proc::Simple quiet.
 sub debug { $Debug = shift; }
 
 ######################################################################
+
+=item cleanup
+
+Proc::Simple keeps around data of terminated processes, e.g. you can check via
+C<t0()> and C<t1()> how long a process ran, even if it's long gone. Over time,
+this data keeps occupying more and more memory and if you have a long-running
+program, you might want to run C<Proc::Simple-E<gt>cleanup()> every once in a
+while to get rid of data pertaining to processes no longer in use.
+
+=cut 
+
+sub cleanup {
+
+    for my $pid ( keys %INTERVAL ) {
+        if( !exists $DESTROYED{ $pid } ) {
+              # process has been reaped already, safe to delete 
+              # its start/stop time
+            delete $INTERVAL{ $pid };
+        }
+    }
+}
+
+######################################################################
 # Internal debug print function
 ######################################################################
 sub dprt {

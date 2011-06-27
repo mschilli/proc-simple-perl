@@ -7,6 +7,9 @@
                      [RT 63833] Applied patch to stop reaping PIDs of 
                        no longer existing processes (submitted by perlbotics).
                      Added licensizer
+                     [RT 63833] (second part) Added cleanup() class method
+                     to delete timing data of reaped processes, avoiding
+                     infinite memory growth on long-running processes
 
           From 1.26: [RT 62285] Pod fix for redirect_output()
                      Fixed github link

@@ -246,25 +246,21 @@ METHODS
         Switches debug messages on and off -- Proc::Simple::debug(1)
         switches them on, Proc::Simple::debug(0) keeps Proc::Simple quiet.
 
+    cleanup
+        Proc::Simple keeps around data of terminated processes, e.g. you can
+        check via "t0()" and "t1()" how long a process ran, even if it's
+        long gone. Over time, this data keeps occupying more and more memory
+        and if you have a long-running program, you might want to run
+        "Proc::Simple->cleanup()" every once in a while to get rid of data
+        pertaining to processes no longer in use.
+
 NOTE
     Please keep in mind that there is no guarantee that the SIGTERM signal
     really terminates a process. Processes can have signal handlers defined
     that avoid the shutdown. If in doubt, whether a process still exists,
     check it repeatedly with the *poll* routine after sending the signal.
 
-REQUIREMENTS
-    I'd recommend using perl 5.6.0 although it might also run with 5.003 --
-    if you don't have it, this is the time to upgrade!
-
-LEGALESE
-    Copyright 1996 by Mike Schilli, all rights reserved. This program is
-    free software, you can redistribute it and/or modify it under the same
-    terms as Perl itself.
-
-AUTHOR
-    Michael Schilli <michael@perlmeister.com>
-
-  Contributors
+Contributors
     Tim Jenness <t.jenness@jach.hawaii.edu> did
     kill_on_destroy/signal_on_destroy/pid
 
@@ -283,11 +279,11 @@ AUTHOR
 
     Brad Cavanagh fixed RT33440 (unreliable $?)
 
+AUTHOR
+        1996, Mike Schilli <cpan@perlmeister.com>
+
 LICENSE
     Copyright 1996-2011 by Mike Schilli, all rights reserved. This program
     is free software, you can redistribute it and/or modify it under the
     same terms as Perl itself.
-
-AUTHOR
-        1996, Mike Schilli <cpan@perlmeister.com>
 
