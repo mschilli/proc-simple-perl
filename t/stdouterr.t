@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 
 use Proc::Simple;
+use Test::More;
 
-$| = 1;
-print "1..2\n";
+plan tests => 2;
 
 sub test_output {
     print "hello stdout\n";
@@ -24,16 +24,7 @@ open FILE, "<stderr.txt" or die "Cannot open stderr.txt";
 my $stderr = join '', <FILE>;
 close FILE;
 
-if($stderr eq "hello stderr\n") {
-    print "ok 1\n";
-} else {
-    print "not ok 1 ($stderr)\n";
-}
-
-if($stdout eq "hello stdout\n") {
-    print "ok 2\n";
-} else {
-    print "not ok 2\n";
-}
+is $stderr, "hello stderr\n", "hello stderr";
+is $stdout, "hello stdout\n", "hello stdout";
 
 unlink("stdout.txt", "stderr.txt");

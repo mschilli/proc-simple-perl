@@ -4,12 +4,12 @@
 ##################################################
 
 use Proc::Simple;
+use Test::More;
+plan tests => 1;
 
 #Proc::Simple::debug(1);
 
 $proc = Proc::Simple->new();
-
-print "1..1\n";
 
 $proc->start("ls . >/dev/null");
 while($proc->poll()) {
@@ -34,8 +34,4 @@ if(defined $proc->exit_status()) {
 }
 Proc::Simple->dprt("EXIT: '$stat'");
 
-if($stat eq 0) {
-    print "ok 1\n";
-} else {
-    print "not ok 1\n";
-}
+is $stat, 0, "stat 0";

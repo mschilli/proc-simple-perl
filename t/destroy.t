@@ -23,23 +23,9 @@
 
 
 use Proc::Simple;
-#Proc::Simple::debug(1);
+use Test::More;
 
-###
-### check(1) -> print #testno ok
-### check(O) -> print #testno not ok
-###
-sub check {
-    my ($yesno) = @_;
-
-    $nu = 1 unless defined $nu;
-    print($yesno ? "ok $nu\n" : "not ok $nu\n");
-    $nu++;
-}
-
-$| = 1;
-
-print "1..4\n";
+plan tests => 5;
 
 ###
 ### Simple Test of destroy
@@ -51,7 +37,7 @@ $coderef = sub { while (1) { sleep(1) } };  # infinite loop
 
 $psh  = Proc::Simple->new();
 
-check($psh->start($coderef));         # 1
+ok($psh->start($coderef));         # 1
 
 # Retrieve the process id (so that we can look for it later)
 
@@ -64,15 +50,16 @@ undef $psh;
 # The sleep is here to make the test fair with the 
 # ond_destroy test later
 sleep 2;
-check($result = kill "SIGTERM", $pid);      # 2
+ok($result = kill "SIGTERM", $pid);      # 2
 
-print "Result should equal 1 if process was killed by us: $result\n";
+ok($result == 1, "check result");        # 3
+# print "Result should equal 1 if process was killed by us: $result\n";
 
 # Now try the same thing with the kill_on_destroy flag set
 
 $psh  = Proc::Simple->new();
 
-check($psh->start($coderef));         # 3
+ok($psh->start($coderef));         # 4
 
 # Retrieve the process id (so that we can look for it later)
 
@@ -94,4 +81,4 @@ while($i++ < 10) {
 }
 
 # Okay if we returned before the 10 secs expired
-check($i<10);
+ok($i<10);
