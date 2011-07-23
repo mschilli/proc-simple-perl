@@ -1,5 +1,5 @@
 ######################################################################
-    Proc::Simple 1.28
+    Proc::Simple 1.29
 ######################################################################
 
 NAME
@@ -196,9 +196,8 @@ METHODS
           $proc->signal_on_destroy("KILL");
 
     redirect_output
-        This allows to redirect the stdout and/or stderr output to a file.
-        Specify undef to leave the stderr/stdout handles of the process
-        alone.
+        Redirects stdout and/or stderr output to a file. Specify undef to
+        leave the stderr/stdout handles of the process alone.
 
           # stdout to a file, left stderr unchanged
           $proc->redirect_output ("/tmp/someapp.stdout", undef);
@@ -259,6 +258,26 @@ NOTE
     really terminates a process. Processes can have signal handlers defined
     that avoid the shutdown. If in doubt, whether a process still exists,
     check it repeatedly with the *poll* routine after sending the signal.
+
+Shell Processes
+    If you pass a shell program to Proc::Simple, it'll use "exec()" to
+    launch it. As noted in Perl's "exec()" manpage, simple commands for the
+    one-argument version of "exec()" will be passed to "execvp()" directly,
+    while commands containing characters like ";" or "*" will be passed to a
+    shell to make sure those get the shell expansion treatment.
+
+    This has the interesting side effect that if you launch something like
+
+        $p->start("./womper *");
+
+    then you'll see two processes in your process list:
+
+        $ ps auxww | grep womper
+        mschilli  9126 11:21 0:00 sh -c ./womper *
+        mschilli  9127 11:21 0:00 /usr/local/bin/perl -w ./womper ...
+
+    and Proc::Simple's "kill()" method will only kill the first one (pid
+    9126).
 
 Contributors
     Tim Jenness <t.jenness@jach.hawaii.edu> did
