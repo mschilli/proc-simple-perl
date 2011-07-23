@@ -4,6 +4,8 @@
 
           From 1.28:
                      [RT 69103] Typo fix by Salvatore Bonaccorso
+                     Added support for processes called via 'sh -c' by
+                     system() (see "Shell Processes" note in the manpage).
           From 1.27:
                      [RT 62802] Pod fix by Salvatore Bonaccorso
                      [RT 63833] Applied patch to stop reaping PIDs of 
