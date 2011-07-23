@@ -256,10 +256,13 @@ sub start {
         autoflush STDOUT 1 ;
       }
 
+        # Mark it as process group leader, so that we can kill
+        # the process group later.
+      POSIX::setsid();
+
       if(ref($func) eq "CODE") {
         $func->(@params); exit 0;            # Start perl subroutine
       } else {
-          POSIX::setsid();
           exec $func, @params;       # Start shell process
           exit 0;                    # In case something goes wrong
       }
@@ -342,6 +345,12 @@ sub kill {
 
   # If no signal specified => SIGTERM-Signal
   $sig = POSIX::SIGTERM() unless defined $sig;
+
+  # Use numeric signal if we get a string 
+  if( $sig !~ /^[-\d]+$/ ) {
+      $sig =~ s/^SIG//g;
+      $sig = eval "POSIX::SIG${sig}()";
+  }
 
   # Process initialized at all?
   return 0 if !defined $self->{'pid'};
