@@ -38,6 +38,16 @@ while( $psh->poll() ) {
 
 ok 1, "process is down";
 
+# as pointed out in [rt.cpan.org #69782], at this point, the grandchild
+# might not have terminated yet or deleted the runfile, although its 
+# parent (the shell process) is gone. Allow 10 seconds max.
+for(1..10) {
+    if( !-f "$Bin/test-prog-running" ) {
+        last;
+    }
+    sleep 1;
+}
+
 ok !-f "$Bin/test-prog-running", "running file unlinked";
 
 1;

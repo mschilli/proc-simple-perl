@@ -2,6 +2,9 @@
     Proc::Simple CHANGES
 ######################################################################
 
+          From 1.29:
+                     [RT 69782] Zefram reported race condition in t/sh-c.t,
+                     fixed by adding polling loop.
           From 1.28:
                      [RT 69103] Typo fix by Salvatore Bonaccorso
                      Added support for processes called via 'sh -c' by

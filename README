@@ -1,5 +1,5 @@
 ######################################################################
-    Proc::Simple 1.29
+    Proc::Simple 1.30
 ######################################################################
 
 NAME
@@ -276,8 +276,11 @@ Shell Processes
         mschilli  9126 11:21 0:00 sh -c ./womper *
         mschilli  9127 11:21 0:00 /usr/local/bin/perl -w ./womper ...
 
-    and Proc::Simple's "kill()" method will only kill the first one (pid
-    9126).
+    A regular "kill()" on the process PID would only kill the first process,
+    but Proc::Simple's "kill()" will use a negative signal and send it to
+    the first process (9126). Since it has marked the process as a process
+    group leader when it created it previously (via setsid()), this will
+    cause both processes above to receive the signal sent by "kill()".
 
 Contributors
     Tim Jenness <t.jenness@jach.hawaii.edu> did
