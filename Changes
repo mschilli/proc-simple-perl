@@ -2,6 +2,10 @@
     Proc::Simple CHANGES
 ######################################################################
 
+          From 1.30:
+                     To better deal with the race condition in the previous 
+                     release, kill the newly created child process first, then 
+                     send a killpg to its process group and ignore the outcome.
           From 1.29:
                      [RT 69782] Zefram reported race condition in t/sh-c.t,
                      fixed by adding polling loop.

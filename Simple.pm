@@ -118,7 +118,7 @@ require Exporter;
 
 @ISA     = qw(Exporter AutoLoader);
 @EXPORT  = qw( );
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -367,23 +367,18 @@ sub kill {
       return 0;
   }
 
-  # kill process group instead of process to make sure that shell
-  # processes containing shell characters, which get launched via
-  # "sh -c" are killed along with their launching shells.
-  $sig = -$sig;
-
   # Send signal
   if(CORE::kill($sig, $self->{'pid'})) {
       $self->dprt("KILL($sig, $self->{'pid'}) OK");
+
+      # now kill process group of process to make sure that shell
+      # processes containing shell characters, which get launched via
+      # "sh -c" are killed along with their launching shells.
+      # This might fail because of the race condition explained in 
+      # start(), so we ignore the outcome.
+      CORE::kill(-$sig, $self->{'pid'});
   } else {
       $self->dprt("KILL($sig, $self->{'pid'}) failed ($!)");
-        # Have we hit the race condition of a newly forked child
-        # that hasn't called setsid() yet? Call kill again with 
-        # a positive sig number.
-      if( $sig and $self->poll() ) {
-          $self->dprt("We've hit the race condition, using kill(+sig) instead");
-          return CORE::kill(-$sig, $self->{'pid'});
-      }
       return 0;
   }
 
