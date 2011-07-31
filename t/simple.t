@@ -17,6 +17,7 @@ plan tests => 10;
 
 ### Shell commands
 
+# Proc::Simple::debug(1);
 $psh  = Proc::Simple->new();
 
 ok($psh->start("sleep 1"));         # 1

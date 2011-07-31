@@ -5,6 +5,14 @@
           From 1.29:
                      [RT 69782] Zefram reported race condition in t/sh-c.t,
                      fixed by adding polling loop.
+
+                     Found that kill(-sig, pid) sometimes fails with 
+                     'process id not found' although a previous kill(0, pid) 
+                     succeeded. This is a race condition condition caused
+                     by a newly forked child that hasn't called setsid() yet
+                     and therefore its new process group id doesn't exist yet,
+                     although the child responds to poll(). kill() now
+                     deals with this case.
           From 1.28:
                      [RT 69103] Typo fix by Salvatore Bonaccorso
                      Added support for processes called via 'sh -c' by
