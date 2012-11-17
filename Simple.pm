@@ -109,15 +109,12 @@ signal_on_destroy methods).
 
 require 5.003;
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXIT_STATUS %INTERVAL
+use vars qw($VERSION %EXIT_STATUS %INTERVAL
             %DESTROYED);
 
 use POSIX;
 use IO::Handle;
-require Exporter;
 
-@ISA     = qw(Exporter AutoLoader);
-@EXPORT  = qw( );
 $VERSION = '1.31';
 
 ######################################################################

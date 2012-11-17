@@ -2,10 +2,17 @@
     Proc::Simple CHANGES
 ######################################################################
 
-          From 1.30:
-                     To better deal with the race condition in the previous 
-                     release, kill the newly created child process first, then 
-                     send a killpg to its process group and ignore the outcome.
+          1.31 (2012/11/17)
+            (ms) To better deal with the race condition in the 
+                 previous release, kill the newly created child 
+                 process first, then send a killpg to its process 
+                 group and ignore the outcome.
+
+            (ms) [RT 81203] Jim A Kessler reported a perl 5.16 issue
+                 with the "AutoLoader" line, so I went ahead and removed
+                 all references to "Exporter" and "AutoLoader", as 
+                 Proc::Simple isn't using them at all.
+
           From 1.29:
                      [RT 69782] Zefram reported race condition in t/sh-c.t,
                      fixed by adding polling loop.
