@@ -11,6 +11,7 @@ my $meta_merge = {
 
 WriteMakefile( 
         'VERSION_FROM' => "Simple.pm",
+	'MIN_PERL_VERSION' => "5.8.3",
 	'NAME'	  => 'Proc::Simple',
 	'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
 	PREREQ_PM => {
