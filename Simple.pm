@@ -115,7 +115,7 @@ use vars qw($VERSION %EXIT_STATUS %INTERVAL
 use POSIX;
 use IO::Handle;
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 ######################################################################
 # Globals: Debug and the mysterious waitpid nohang constant.
@@ -252,13 +252,13 @@ sub start {
 
       if (defined $self->{'redirect_stderr'}) {
         $self->dprt("STDERR -> $self->{'redirect_stderr'}");
-        open(STDERR, ">$self->{'redirect_stderr'}") ;
+        open(STDERR, ">", $self->{'redirect_stderr'}) ;
         autoflush STDERR 1 ;
       }
 
       if (defined $self->{'redirect_stdout'}) {
         $self->dprt("STDOUT -> $self->{'redirect_stdout'}");
-        open(STDOUT, ">$self->{'redirect_stdout'}") ;
+        open(STDOUT, ">", $self->{'redirect_stdout'}) ;
         autoflush STDOUT 1 ;
       }
 
